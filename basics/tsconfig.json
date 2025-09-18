@@ -42,6 +42,7 @@
     "skipLibCheck": true,
 
     "moduleResolution": "node10",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   }
 }

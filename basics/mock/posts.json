@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "title": "My first post",
+    "body": "Hello world!",
+    "published": true,
+    "author": "1"
+  },
+  {
+    "id": "2",
+    "title": "GraphQL is awesome",
+    "body": "Let's learn GraphQL",
+    "author": "1",
+    "published": false
+  },
+  {
+    "id": "3",
+    "title": "Advanced TypeScript",
+    "body": "TypeScript generics and more",
+    "published": true,
+    "author": "2"
+  }
+]
