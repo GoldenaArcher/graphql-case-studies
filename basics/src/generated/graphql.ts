@@ -26,12 +26,20 @@ export type Comment = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addPost: Post;
-  addUser: User;
+  createComment: Comment;
+  createPost: Post;
+  createUser: User;
 };
 
 
-export type MutationAddPostArgs = {
+export type MutationCreateCommentArgs = {
+  author: Scalars['ID']['input'];
+  post: Scalars['ID']['input'];
+  text: Scalars['String']['input'];
+};
+
+
+export type MutationCreatePostArgs = {
   author: Scalars['ID']['input'];
   body: Scalars['String']['input'];
   published: Scalars['Boolean']['input'];
@@ -39,7 +47,7 @@ export type MutationAddPostArgs = {
 };
 
 
-export type MutationAddUserArgs = {
+export type MutationCreateUserArgs = {
   age?: InputMaybe<Scalars['Int']['input']>;
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -62,6 +70,16 @@ export type Query = {
   post: Post;
   posts: Array<Maybe<Post>>;
   users: Array<Maybe<User>>;
+};
+
+
+export type QueryCommentsArgs = {
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryPostArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -189,8 +207,9 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  addPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationAddPostArgs, 'author' | 'body' | 'published' | 'title'>>;
-  addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name'>>;
+  createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'author' | 'post' | 'text'>>;
+  createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'author' | 'body' | 'published' | 'title'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'name'>>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
@@ -203,9 +222,9 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  comments?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType>;
+  comments?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType, Partial<QueryCommentsArgs>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<QueryPostArgs, 'id'>>;
   posts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType, Partial<QueryPostsArgs>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
 };

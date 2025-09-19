@@ -3,29 +3,26 @@ import posts from "../../../mock/posts.json";
 import comments from "../../../mock/comments.json";
 
 import {
+  type Comment,
+  type MutationCreateCommentArgs,
+  type MutationCreatePostArgs,
+  type MutationCreateUserArgs,
   type Post,
   type QueryUsersArgs,
   type Resolvers,
   type User,
 } from "../../generated/graphql";
 
-type PostDb = {
-  id: string;
-  title: string;
-  author: string;
-};
-
 export const resolvers: Resolvers = {
   Query: {
     // args are: parent, args, context, info
-    me: () => ({
-      id: "1",
-      name: "Alice",
-      email: "alice@example.com",
-      age: 30,
-      posts: [],
-      comments: [],
-    }),
+    me: () =>
+      ({
+        id: "1",
+        name: "Alice",
+        email: "alice@example.com",
+        age: 30,
+      } as User),
     users: (_parent, { query }: Partial<QueryUsersArgs>): User[] => {
       if (!query) return users as User[];
       return users.filter((user) =>
@@ -53,10 +50,7 @@ export const resolvers: Resolvers = {
     },
   },
   Mutation: {
-    addUser: (
-      _parent,
-      args: { name: string; email: string; age?: number | null }
-    ) => {
+    createUser: (_parent, args: MutationCreateUserArgs) => {
       const isEmailTaken = users.some((user) => user.email === args.email);
 
       if (isEmailTaken) {
@@ -65,17 +59,12 @@ export const resolvers: Resolvers = {
 
       const newUser = {
         id: crypto.randomUUID(),
-        name: args.name,
-        email: args.email,
-        age: args.age || null,
+        ...args,
       } as User;
       users.push(newUser);
       return newUser;
     },
-    addPost: (
-      _parent,
-      args: { title: string; body: string; published: boolean; author: string }
-    ) => {
+    createPost: (_parent, args: MutationCreatePostArgs) => {
       const userExists = users.some((user) => user.id === args.author);
 
       if (!userExists) {
@@ -84,13 +73,33 @@ export const resolvers: Resolvers = {
 
       const newPost = {
         id: crypto.randomUUID(),
-        title: args.title,
-        body: args.body,
-        published: args.published,
-        author: args.author,
+        ...args,
       };
       posts.push(newPost);
       return newPost as unknown as Post;
+    },
+    createComment: (
+      _parent,
+      { text, author, post }: MutationCreateCommentArgs
+    ) => {
+      const userExists = users.some((user) => user.id === author);
+      const postExists = posts.some((p) => p.id === post && p.published);
+
+      if (!userExists) {
+        throw new Error("User not found");
+      }
+      if (!postExists) {
+        throw new Error("Post not found");
+      }
+
+      const newComment = {
+        id: crypto.randomUUID(),
+        text,
+        userId: author,
+        postId: post,
+      };
+      comments.push(newComment);
+      return newComment as unknown as Comment;
     },
   },
   Post: {
