@@ -1,9 +1,11 @@
 import http from "http";
+import crypto from "crypto";
 import { createSchema, createYoga } from "graphql-yoga";
 
 import users from "../mock/users.json";
 import posts from "../mock/posts.json";
 import comments from "../mock/comments.json";
+
 
 type Context = {};
 
@@ -14,6 +16,16 @@ const typeDefs = /* GraphQL */ `
     post: Post!
     posts(query: String): [Post]!
     comments: [Comment]!
+  }
+
+  type Mutation {
+    addUser(name: String!, email: String!, age: Int): User!
+    addPost(
+      title: String!
+      body: String!
+      published: Boolean!
+      author: ID!
+    ): Post!
   }
 
   type User {
@@ -75,11 +87,52 @@ const resolvers = {
       return comments;
     },
   },
+  Mutation: {
+    addUser: (
+      _parent: unknown,
+      args: { name: string; email: string; age?: number }
+    ) => {
+      const isEmailTaken = users.some((user) => user.email === args.email);
+
+      if (isEmailTaken) {
+        throw new Error("Email is already taken");
+      }
+
+      const newUser = {
+        id: crypto.randomUUID(),
+        name: args.name,
+        email: args.email,
+        age: args.age || null,
+      };
+      users.push(newUser);
+      return newUser;
+    },
+    addPost: (
+      _parent: unknown,
+      args: { title: string; body: string; published: boolean; author: string }
+    ) => {
+      const userExists = users.some((user) => user.id === args.author);
+
+      if (!userExists) {
+        throw new Error("User not found");
+      }
+
+      const newPost = {
+        id: crypto.randomUUID(),
+        title: args.title,
+        body: args.body,
+        published: args.published,
+        author: args.author,
+      };
+      posts.push(newPost);
+      return newPost;
+    },
+  },
   Post: {
     author(parent: { author: string }) {
       return users.find((user) => user.id === parent.author);
     },
-    comments(parent: { id: string }) {
+    comments(parent: { id: string }) {  
       return comments.filter((comment) => comment.postId === parent.id);
     },
   },
@@ -89,7 +142,7 @@ const resolvers = {
     },
     comments(parent: { id: string }) {
       return comments.filter((comment) => comment.userId === parent.id);
-    }
+    },
   },
   Comment: {
     author(parent: { userId: string }) {
