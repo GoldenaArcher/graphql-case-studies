@@ -14,9 +14,10 @@ export const userQueries: Pick<QueryResolvers, "me" | "users"> = {
       age: 30,
     } as User),
   users: (_parent, { query }: Partial<QueryUsersArgs>): User[] => {
-    if (!query) return users as User[];
-    return users.filter((user) =>
-      user.name.toLowerCase().includes(query.toLowerCase())
+    if (!query) return users.filter((user) => user.active) as User[];
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(query.toLowerCase()) && user.active
     ) as User[];
   },
 };

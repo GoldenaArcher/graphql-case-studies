@@ -23,7 +23,10 @@ export const commentMutations: Pick<MutationResolvers, "createComment"> = {
       userId: author,
       postId: post,
     };
-    comments.push(newComment);
+    comments.push({
+      ...newComment,
+      orphaned: false,
+    });
     return newComment as any;
   },
 };

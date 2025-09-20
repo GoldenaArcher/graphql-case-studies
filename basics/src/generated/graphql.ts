@@ -18,9 +18,9 @@ export type Scalars = {
 
 export type Comment = {
   __typename?: 'Comment';
-  author: User;
+  author?: Maybe<User>;
   id: Scalars['ID']['output'];
-  post: Post;
+  post?: Maybe<Post>;
   text: Scalars['String']['output'];
 };
 
@@ -73,7 +73,7 @@ export type MutationDeleteUserArgs = {
 
 export type Post = {
   __typename?: 'Post';
-  author: User;
+  author?: Maybe<User>;
   body: Scalars['String']['output'];
   comments: Array<Maybe<Comment>>;
   id: Scalars['ID']['output'];
@@ -112,6 +112,7 @@ export type QueryUsersArgs = {
 
 export type User = {
   __typename?: 'User';
+  active: Scalars['Boolean']['output'];
   age?: Maybe<Scalars['Int']['output']>;
   comments: Array<Maybe<Comment>>;
   email: Scalars['String']['output'];
@@ -224,9 +225,9 @@ export type ResolversParentTypes = {
 };
 
 export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
-  author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  author?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+  post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
@@ -238,7 +239,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
-  author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  author?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   comments?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -255,6 +256,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   age?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   comments?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

@@ -3,7 +3,7 @@ type Post {
   title: String!
   body: String!
   published: Boolean!
-  author: User!
+  author: User
   comments: [Comment]!
 }
 

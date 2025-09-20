@@ -11,11 +11,13 @@ export const postQueries: Pick<QueryResolvers, "post" | "posts"> = {
     comments: [],
   }),
   posts: (_parent, { query }): Post[] => {
-    if (!query) return posts as unknown as Post[];
+    if (!query)
+      return posts.filter((post) => !post.archived) as unknown as Post[];
     return posts.filter(
       (post) =>
         post.title.toLowerCase().includes(query.toLowerCase()) ||
-        post.body.toLowerCase().includes(query.toLowerCase())
+        (post.body.toLowerCase().includes(query.toLowerCase()) &&
+          !post.archived)
     ) as unknown as Post[];
   },
 };
