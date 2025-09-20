@@ -48,6 +48,7 @@ export type Mutation = {
   createComment: Comment;
   createPost: Post;
   createUser: User;
+  deleteUser: Scalars['Boolean']['output'];
 };
 
 
@@ -63,6 +64,11 @@ export type MutationCreatePostArgs = {
 
 export type MutationCreateUserArgs = {
   data: CreateUserInput;
+};
+
+
+export type MutationDeleteUserArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type Post = {
@@ -228,6 +234,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'data'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'data'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'data'>>;
+  deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {

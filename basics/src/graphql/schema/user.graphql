@@ -20,4 +20,5 @@ extend type Query {
 
 extend type Mutation {
   createUser(data: CreateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
 }
