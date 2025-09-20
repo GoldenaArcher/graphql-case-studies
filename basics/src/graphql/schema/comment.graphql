@@ -5,10 +5,16 @@ type Comment {
   post: Post!
 }
 
+input CreateCommentInput {
+  text: String!
+  author: ID!
+  post: ID!
+}
+
 extend type Query {
   comments(query: String): [Comment]!
 }
 
 extend type Mutation {
-  createComment(text: String!, author: ID!, post: ID!): Comment!
+  createComment(data: CreateCommentInput!): Comment!
 }

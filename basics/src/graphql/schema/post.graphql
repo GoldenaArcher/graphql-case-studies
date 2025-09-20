@@ -7,16 +7,18 @@ type Post {
   comments: [Comment]!
 }
 
+input CreatePostInput {
+  title: String!
+  body: String!
+  published: Boolean!
+  author: ID!
+}
+
 extend type Query {
   posts(query: String): [Post]!
   post(id: ID!): Post!
 }
 
 extend type Mutation {
-  createPost(
-    title: String!
-    body: String!
-    published: Boolean!
-    author: ID!
-  ): Post!
+  createPost(data: CreatePostInput!): Post!
 }

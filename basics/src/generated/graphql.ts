@@ -24,6 +24,25 @@ export type Comment = {
   text: Scalars['String']['output'];
 };
 
+export type CreateCommentInput = {
+  author: Scalars['ID']['input'];
+  post: Scalars['ID']['input'];
+  text: Scalars['String']['input'];
+};
+
+export type CreatePostInput = {
+  author: Scalars['ID']['input'];
+  body: Scalars['String']['input'];
+  published: Scalars['Boolean']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type CreateUserInput = {
+  age?: InputMaybe<Scalars['Int']['input']>;
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createComment: Comment;
@@ -33,24 +52,17 @@ export type Mutation = {
 
 
 export type MutationCreateCommentArgs = {
-  author: Scalars['ID']['input'];
-  post: Scalars['ID']['input'];
-  text: Scalars['String']['input'];
+  data: CreateCommentInput;
 };
 
 
 export type MutationCreatePostArgs = {
-  author: Scalars['ID']['input'];
-  body: Scalars['String']['input'];
-  published: Scalars['Boolean']['input'];
-  title: Scalars['String']['input'];
+  data: CreatePostInput;
 };
 
 
 export type MutationCreateUserArgs = {
-  age?: InputMaybe<Scalars['Int']['input']>;
-  email: Scalars['String']['input'];
-  name: Scalars['String']['input'];
+  data: CreateUserInput;
 };
 
 export type Post = {
@@ -177,6 +189,9 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
+  CreateCommentInput: CreateCommentInput;
+  CreatePostInput: CreatePostInput;
+  CreateUserInput: CreateUserInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -190,6 +205,9 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
+  CreateCommentInput: CreateCommentInput;
+  CreatePostInput: CreatePostInput;
+  CreateUserInput: CreateUserInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Mutation: Record<PropertyKey, never>;
@@ -207,9 +225,9 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'author' | 'post' | 'text'>>;
-  createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'author' | 'body' | 'published' | 'title'>>;
-  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'name'>>;
+  createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'data'>>;
+  createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'data'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'data'>>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {

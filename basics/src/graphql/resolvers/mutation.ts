@@ -12,8 +12,8 @@ import posts from "../../../mock/posts.json";
 import comments from "../../../mock/comments.json";
 
 export const mutationResolvers: MutationResolvers = {
-  createUser: (_parent, args: MutationCreateUserArgs) => {
-    const isEmailTaken = users.some((user) => user.email === args.email);
+  createUser: (_parent, { data }: MutationCreateUserArgs) => {
+    const isEmailTaken = users.some((user) => user.email === data.email);
 
     if (isEmailTaken) {
       throw new Error("Email is already taken");
@@ -21,13 +21,13 @@ export const mutationResolvers: MutationResolvers = {
 
     const newUser = {
       id: crypto.randomUUID(),
-      ...args,
+      ...data,
     } as User;
     users.push(newUser);
     return newUser;
   },
-  createPost: (_parent, args: MutationCreatePostArgs) => {
-    const userExists = users.some((user) => user.id === args.author);
+  createPost: (_parent, { data }: MutationCreatePostArgs) => {
+    const userExists = users.some((user) => user.id === data.author);
 
     if (!userExists) {
       throw new Error("User not found");
@@ -35,14 +35,14 @@ export const mutationResolvers: MutationResolvers = {
 
     const newPost = {
       id: crypto.randomUUID(),
-      ...args,
+      ...data,
     };
     posts.push(newPost);
     return newPost as unknown as Post;
   },
   createComment: (
     _parent,
-    { text, author, post }: MutationCreateCommentArgs
+    { data: { text, author, post } }: MutationCreateCommentArgs
   ) => {
     const userExists = users.some((user) => user.id === author);
     const postExists = posts.some((p) => p.id === post && p.published);
