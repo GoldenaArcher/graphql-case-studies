@@ -1,12 +1,16 @@
 import type {
   MutationCreateCommentArgs,
+  MutationDeleteCommentArgs,
   MutationResolvers,
 } from "../../../generated/graphql";
-import comments from "./data";
+import comments, { archiveComment } from "./data";
 import posts from "../post/data";
 import users from "../user/data";
 
-export const commentMutations: Pick<MutationResolvers, "createComment"> = {
+export const commentMutations: Pick<
+  MutationResolvers,
+  "createComment" | "deleteComment"
+> = {
   createComment: (
     _parent,
     { data: { text, author, post } }: MutationCreateCommentArgs
@@ -26,7 +30,12 @@ export const commentMutations: Pick<MutationResolvers, "createComment"> = {
     comments.push({
       ...newComment,
       orphaned: false,
+      archived: false,
     });
     return newComment as any;
+  },
+  deleteComment: (_parent, { id }: MutationDeleteCommentArgs) => {
+    archiveComment(id);
+    return true;
   },
 };

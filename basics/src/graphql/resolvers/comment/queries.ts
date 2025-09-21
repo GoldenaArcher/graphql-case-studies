@@ -4,6 +4,6 @@ import comments from "./data";
 
 export const commentQueries: Pick<QueryResolvers, "comments"> = {
   comments: () => {
-    return comments.filter((comment) => !comment.orphaned) as any;
+    return comments.filter((comment) => !comment.archived) as any;
   },
 };

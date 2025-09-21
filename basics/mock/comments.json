@@ -4,69 +4,79 @@
     "text": "Great post!",
     "userId": "1",
     "postId": "1",
-    "orphaned": false
+    "orphaned": false,
+    "archived": true
   },
   {
     "id": "2",
     "text": "Thanks for sharing.",
     "userId": "2",
     "postId": "1",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "3",
     "text": "Interesting read.",
     "userId": "1",
     "postId": "2",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "4",
     "text": "I learned something new.",
     "userId": "2",
     "postId": "1",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "5",
     "text": "Looking forward to more content.",
     "userId": "1",
     "postId": "1",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "6",
     "text": "Well written!",
     "userId": "2",
     "postId": "1",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "7",
     "text": "This was very helpful.",
     "userId": "1",
     "postId": "2",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "8",
     "text": "I disagree with some points.",
     "userId": "1",
     "postId": "1",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   },
   {
     "id": "9",
     "text": "Can you elaborate more?",
     "userId": "1",
     "postId": "1",
-    "orphaned": true
+    "orphaned": true,
+    "archived": false
   },
   {
     "id": "10",
     "text": "Awesome!",
     "userId": "2",
     "postId": "2",
-    "orphaned": false
+    "orphaned": false,
+    "archived": false
   }
 ]

@@ -21,4 +21,5 @@ extend type Query {
 
 extend type Mutation {
   createPost(data: CreatePostInput!): Post!
+  deletePost(id: ID!): Boolean!
 }
