@@ -51,6 +51,9 @@ export type Mutation = {
   deleteComment: Scalars['Boolean']['output'];
   deletePost: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  updateComment: Comment;
+  updatePost: Post;
+  updateUser: User;
 };
 
 
@@ -80,6 +83,24 @@ export type MutationDeletePostArgs = {
 
 
 export type MutationDeleteUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateCommentArgs = {
+  data: UpdateCommentInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdatePostArgs = {
+  data: UpdatePostInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  data: UpdateUserInput;
   id: Scalars['ID']['input'];
 };
 
@@ -120,6 +141,22 @@ export type QueryPostsArgs = {
 
 export type QueryUsersArgs = {
   query?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateCommentInput = {
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdatePostInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  published?: InputMaybe<Scalars['Boolean']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateUserInput = {
+  age?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type User = {
@@ -217,6 +254,9 @@ export type ResolversTypes = {
   Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  UpdateCommentInput: UpdateCommentInput;
+  UpdatePostInput: UpdatePostInput;
+  UpdateUserInput: UpdateUserInput;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -233,6 +273,9 @@ export type ResolversParentTypes = {
   Post: Post;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
+  UpdateCommentInput: UpdateCommentInput;
+  UpdatePostInput: UpdatePostInput;
+  UpdateUserInput: UpdateUserInput;
   User: User;
 };
 
@@ -250,6 +293,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteComment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteCommentArgs, 'id'>>;
   deletePost?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePostArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
+  updateComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationUpdateCommentArgs, 'data' | 'id'>>;
+  updatePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationUpdatePostArgs, 'data' | 'id'>>;
+  updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'data' | 'id'>>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {

@@ -2,14 +2,15 @@ import type {
   MutationCreateUserArgs,
   MutationDeleteUserArgs,
   MutationResolvers,
+  MutationUpdateUserArgs,
   User,
 } from "../../../generated/graphql";
 
-import users, { deactivateUser } from "./data";
+import users, { deactivateUser, updateUser } from "./data";
 
 export const userMutations: Pick<
   MutationResolvers,
-  "createUser" | "deleteUser"
+  "createUser" | "deleteUser" | "updateUser"
 > = {
   createUser: (_parent, { data }: MutationCreateUserArgs) => {
     const isEmailTaken = users.some((user) => user.email === data.email);
@@ -25,10 +26,12 @@ export const userMutations: Pick<
     users.push(newUser);
     return newUser;
   },
-
   deleteUser: (_parent, { id }: MutationDeleteUserArgs) => {
     deactivateUser(id);
 
     return true;
+  },
+  updateUser: (_parent, { id, data }: MutationUpdateUserArgs) => {
+    return updateUser(id, data) as User;
   },
 };
