@@ -143,6 +143,11 @@ export type QueryUsersArgs = {
   query?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  count: Scalars['Int']['output'];
+};
+
 export type UpdateCommentInput = {
   text?: InputMaybe<Scalars['String']['input']>;
 };
@@ -254,6 +259,7 @@ export type ResolversTypes = {
   Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
   UpdateCommentInput: UpdateCommentInput;
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
@@ -273,6 +279,7 @@ export type ResolversParentTypes = {
   Post: Post;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
+  Subscription: Record<PropertyKey, never>;
   UpdateCommentInput: UpdateCommentInput;
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
@@ -315,6 +322,10 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
 };
 
+export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  count?: SubscriptionResolver<ResolversTypes['Int'], "count", ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   age?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -330,6 +341,7 @@ export type Resolvers<ContextType = any> = {
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

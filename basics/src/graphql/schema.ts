@@ -16,5 +16,5 @@ export const typeDefs = mergeTypeDefs(typesArray);
 
 export const schema = makeExecutableSchema({
   typeDefs,
-  resolvers: resolvers,
+  resolvers,
 });
