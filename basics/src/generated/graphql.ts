@@ -145,7 +145,13 @@ export type QueryUsersArgs = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  comment: Comment;
   count: Scalars['Int']['output'];
+};
+
+
+export type SubscriptionCommentArgs = {
+  postId: Scalars['ID']['input'];
 };
 
 export type UpdateCommentInput = {
@@ -323,6 +329,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  comment?: SubscriptionResolver<ResolversTypes['Comment'], "comment", ParentType, ContextType, RequireFields<SubscriptionCommentArgs, 'postId'>>;
   count?: SubscriptionResolver<ResolversTypes['Int'], "count", ParentType, ContextType>;
 };
 

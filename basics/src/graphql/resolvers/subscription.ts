@@ -2,6 +2,7 @@ import { setTimeout as setTimeout$ } from "node:timers/promises";
 
 import type { SubscriptionResolvers } from "../../generated/graphql";
 import type { GraphQLContext } from "../context";
+import { commentSubscriptions } from "./comment/subscriptions";
 
 export const Subscription: SubscriptionResolvers<GraphQLContext> = {
   count: {
@@ -17,4 +18,5 @@ export const Subscription: SubscriptionResolvers<GraphQLContext> = {
     // },
     // resolve: (payload: number) => payload,
   },
+  ...commentSubscriptions,
 };

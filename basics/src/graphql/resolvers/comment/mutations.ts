@@ -7,6 +7,7 @@ import type {
 import comments, { archiveComment, updateComment } from "./data";
 import posts from "../post/data";
 import users from "../user/data";
+import type { GraphQLContext } from "../../context";
 
 export const commentMutations: Pick<
   MutationResolvers,
@@ -14,7 +15,8 @@ export const commentMutations: Pick<
 > = {
   createComment: (
     _parent,
-    { data: { text, author, post } }: MutationCreateCommentArgs
+    { data: { text, author, post } }: MutationCreateCommentArgs,
+    { pubsub }: GraphQLContext
   ) => {
     const userExists = users.some((user) => user.id === author);
     const postExists = posts.some((p) => p.id === post && p.published);
@@ -27,13 +29,15 @@ export const commentMutations: Pick<
       text,
       userId: author,
       postId: post,
-    };
-    comments.push({
-      ...newComment,
       orphaned: false,
       archived: false,
-    });
-    return newComment as any;
+    };
+
+    comments.push(newComment);
+
+    pubsub.publish(`comment-${post}`, newComment as any);
+
+    return newComment;
   },
   deleteComment: (_parent, { id }: MutationDeleteCommentArgs) => {
     archiveComment(id);
