@@ -30,3 +30,7 @@ extend type Mutation {
   deletePost(id: ID!): Boolean!
   updatePost(id: ID!, data: UpdatePostInput!): Post!
 }
+
+extend type Subscription {
+  post: Post!
+}
