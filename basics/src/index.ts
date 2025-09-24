@@ -2,20 +2,41 @@ import http from "http";
 import { createYoga } from "graphql-yoga";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/use/ws";
+import { randomUUID } from "crypto";
 
 import { schema } from "./graphql/schema";
 import { pubsub, type GraphQLContext } from "./graphql/context";
 // import { startMockCountPublisher } from "./graphql/pubsub/startMockCountPublisher";
 
+import { logger } from "./utils/logger";
+
 const yogaApp = createYoga<GraphQLContext>({
   schema,
   graphqlEndpoint: "/graphql",
-  context: ({ request }): GraphQLContext => ({ pubsub }),
+  context: ({ request }): GraphQLContext => {
+    const requestId = randomUUID();
+
+    if (request) {
+      logger.info({ requestId, url: request.url }, "Incoming HTTP request");
+    } else {
+      logger.info(
+        { requestId },
+        "Incoming WS subscription or non-HTTP request"
+      );
+    }
+    
+    return { pubsub, requestId };
+  },
   graphiql: {
     // Use WebSockets in GraphiQL
     subscriptionsProtocol: "WS",
   },
-  logging: "debug",
+  logging: {
+    debug: (msg) => logger.debug(msg),
+    info: (msg) => logger.info(msg),
+    warn: (msg) => logger.warn(msg),
+    error: (msg) => logger.error(msg),
+  },
 });
 
 const httpServer = http.createServer(yogaApp);
@@ -59,7 +80,7 @@ useServer(
 
 const port = Number(process.env.PORT) || 4000;
 httpServer.listen(port, () => {
-  console.log(`🚀 Yoga ready at http://localhost:${port}/graphql`);
+  logger.info(`🚀 Yoga ready at http://localhost:${port}/graphql`);
 });
 
 // startMockCountPublisher();

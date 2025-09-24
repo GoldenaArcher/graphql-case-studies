@@ -15,4 +15,5 @@ export const pubsub = createPubSub<{
 
 export type GraphQLContext = {
   pubsub: typeof pubsub;
+  requestId?: string;
 };
