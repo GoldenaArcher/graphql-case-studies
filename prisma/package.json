@@ -5,8 +5,10 @@
   "scripts": {
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev",
+    "db:reset": "npx prisma migrate reset",
     "db:studio": "npx prisma studio",
-    "db:all": "npm run db:generate && npm run db:migrate && npm run db:studio"
+    "db:all": "npm run db:generate && npm run db:migrate && npm run db:studio",
+    "db:sync": "npx prisma db push && npx prisma generate && npx prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2"

@@ -15,6 +15,29 @@ datasource db {
 }
 
 model User {
-  id   Int    @id @unique
-  name String
+  id      String    @id @unique @default(uuid())
+  name    String
+  email   String    @unique
+  age     Int
+  posts   Post[]
+  Comment Comment[]
+}
+
+model Post {
+  id        String    @id @unique @default(uuid())
+  title     String
+  body      String
+  published Boolean   @default(false)
+  User      User      @relation(fields: [userId], references: [id])
+  userId    String
+  Comment   Comment[]
+}
+
+model Comment {
+  id      String @id @unique @default(uuid())
+  content String
+  Post    Post   @relation(fields: [postId], references: [id])
+  postId  String
+  User    User   @relation(fields: [userId], references: [id])
+  userId  String
 }
