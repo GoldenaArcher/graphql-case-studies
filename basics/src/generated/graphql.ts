@@ -24,6 +24,12 @@ export type Comment = {
   text: Scalars['String']['output'];
 };
 
+export type CommentEvent = {
+  __typename?: 'CommentEvent';
+  data: Comment;
+  type: EventType;
+};
+
 export type CreateCommentInput = {
   author: Scalars['ID']['input'];
   post: Scalars['ID']['input'];
@@ -43,6 +49,13 @@ export type CreateUserInput = {
   name: Scalars['String']['input'];
 };
 
+export const EventType = {
+  Created: 'CREATED',
+  Deleted: 'DELETED',
+  Updated: 'UPDATED'
+} as const;
+
+export type EventType = typeof EventType[keyof typeof EventType];
 export type Mutation = {
   __typename?: 'Mutation';
   createComment: Comment;
@@ -114,6 +127,12 @@ export type Post = {
   title: Scalars['String']['output'];
 };
 
+export type PostEvent = {
+  __typename?: 'PostEvent';
+  data: Post;
+  type: EventType;
+};
+
 export type Query = {
   __typename?: 'Query';
   comments: Array<Maybe<Comment>>;
@@ -145,9 +164,9 @@ export type QueryUsersArgs = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  comment: Comment;
+  comment: CommentEvent;
   count: Scalars['Int']['output'];
-  post: Post;
+  post: PostEvent;
 };
 
 
@@ -257,13 +276,16 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
+  CommentEvent: ResolverTypeWrapper<CommentEvent>;
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
   CreateUserInput: CreateUserInput;
+  EventType: EventType;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Post: ResolverTypeWrapper<Post>;
+  PostEvent: ResolverTypeWrapper<PostEvent>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -277,6 +299,7 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
+  CommentEvent: CommentEvent;
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
   CreateUserInput: CreateUserInput;
@@ -284,6 +307,7 @@ export type ResolversParentTypes = {
   Int: Scalars['Int']['output'];
   Mutation: Record<PropertyKey, never>;
   Post: Post;
+  PostEvent: PostEvent;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
   Subscription: Record<PropertyKey, never>;
@@ -298,6 +322,11 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+};
+
+export type CommentEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentEvent'] = ResolversParentTypes['CommentEvent']> = {
+  data?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -321,6 +350,11 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
+export type PostEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['PostEvent'] = ResolversParentTypes['PostEvent']> = {
+  data?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   comments?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType, Partial<QueryCommentsArgs>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
@@ -330,9 +364,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
-  comment?: SubscriptionResolver<ResolversTypes['Comment'], "comment", ParentType, ContextType, RequireFields<SubscriptionCommentArgs, 'postId'>>;
+  comment?: SubscriptionResolver<ResolversTypes['CommentEvent'], "comment", ParentType, ContextType, RequireFields<SubscriptionCommentArgs, 'postId'>>;
   count?: SubscriptionResolver<ResolversTypes['Int'], "count", ParentType, ContextType>;
-  post?: SubscriptionResolver<ResolversTypes['Post'], "post", ParentType, ContextType>;
+  post?: SubscriptionResolver<ResolversTypes['PostEvent'], "post", ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -347,8 +381,10 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   Comment?: CommentResolvers<ContextType>;
+  CommentEvent?: CommentEventResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
+  PostEvent?: PostEventResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

@@ -4,10 +4,13 @@ import type {
   MutationResolvers,
   MutationUpdateCommentArgs,
 } from "../../../generated/graphql";
+
 import comments, { archiveComment, updateComment } from "./data";
 import posts from "../post/data";
 import users from "../user/data";
-import type { GraphQLContext } from "../../context";
+
+import type { GraphQLContext } from "../../context/type";
+import { commentLogger } from "../../../utils/logger";
 
 export const commentMutations: Pick<
   MutationResolvers,
@@ -34,8 +37,13 @@ export const commentMutations: Pick<
     };
 
     comments.push(newComment);
+    commentLogger.info({ commentId: newComment.id }, "Comment created");
 
-    pubsub.publish(`comment-${post}`, newComment as any);
+    pubsub.publish(`comment:CREATED:${post}`, {
+      type: "CREATED",
+      data: newComment as any,
+    });
+    commentLogger.info({ commentId: newComment.id }, `Comment published to post ${post}`);
 
     return newComment;
   },

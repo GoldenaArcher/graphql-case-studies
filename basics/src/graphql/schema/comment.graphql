@@ -25,6 +25,11 @@ extend type Mutation {
   updateComment(id: ID!, data: UpdateCommentInput!): Comment!
 }
 
+type CommentEvent {
+  type: EventType!
+  data: Comment!
+}
+
 extend type Subscription {
-  comment(postId: ID!): Comment!
+  comment(postId: ID!): CommentEvent!
 }

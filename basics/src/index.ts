@@ -5,8 +5,10 @@ import { useServer } from "graphql-ws/use/ws";
 import { randomUUID } from "crypto";
 
 import { schema } from "./graphql/schema";
-import { pubsub, type GraphQLContext } from "./graphql/context";
 // import { startMockCountPublisher } from "./graphql/pubsub/startMockCountPublisher";
+
+import type { GraphQLContext } from "./graphql/context/type";
+import { pubsub } from "./graphql/context/pubsub";
 
 import { logger } from "./utils/logger";
 
@@ -24,7 +26,7 @@ const yogaApp = createYoga<GraphQLContext>({
         "Incoming WS subscription or non-HTTP request"
       );
     }
-    
+
     return { pubsub, requestId };
   },
   graphiql: {

@@ -5,9 +5,12 @@ import type {
   MutationUpdatePostArgs,
   Post,
 } from "../../../generated/graphql";
+import type { GraphQLContext } from "../../context/type";
+
 import posts, { archivePost, updatePost } from "./data";
 import users from "../user/data";
-import type { GraphQLContext } from "../../context";
+
+import { postLogger } from "../../../utils/logger";
 
 export const postMutations: Pick<
   MutationResolvers,
@@ -31,9 +34,14 @@ export const postMutations: Pick<
     };
     posts.push(newPost);
 
-    pubsub.publish(`post`, newPost as unknown as Post);
+    postLogger.info({ post: newPost }, "Post created");
 
-    console.log("create and publish post", `post`);
+    pubsub.publish(`post:CREATED`, {
+      type: `CREATED`,
+      data: newPost as unknown as Post,
+    });
+
+    postLogger.info({ post: newPost }, "Post published");
 
     return newPost as unknown as Post;
   },
