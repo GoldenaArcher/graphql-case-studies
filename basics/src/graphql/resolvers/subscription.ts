@@ -1,7 +1,7 @@
 import { setTimeout as setTimeout$ } from "node:timers/promises";
 
 import type { SubscriptionResolvers } from "../../generated/graphql";
-import type { GraphQLContext } from "../context";
+import type { GraphQLContext } from "../context/type";
 import { commentSubscriptions } from "./comment/subscriptions";
 import { postSubscriptions } from "./post/subscriptions";
 

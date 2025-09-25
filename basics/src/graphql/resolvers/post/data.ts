@@ -15,6 +15,8 @@ export const archivePost = (id: string) => {
   orphanCommentsByPostId(id);
 
   post.archived = true;
+
+  return post;
 };
 
 export const updatePost = (id: string, data: UpdatePostInput) => {

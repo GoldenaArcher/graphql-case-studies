@@ -27,7 +27,7 @@ extend type Mutation {
 
 type CommentEvent {
   type: EventType!
-  data: Comment!
+  data: Comment
 }
 
 extend type Subscription {

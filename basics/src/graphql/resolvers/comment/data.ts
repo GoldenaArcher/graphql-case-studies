@@ -19,6 +19,8 @@ export const archiveComment = (id: string) => {
   }
 
   comment.archived = true;
+
+  return comment;
 };
 
 export const updateComment = (id: string, data: UpdateCommentInput) => {

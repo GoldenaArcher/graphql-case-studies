@@ -26,7 +26,7 @@ export type Comment = {
 
 export type CommentEvent = {
   __typename?: 'CommentEvent';
-  data: Comment;
+  data?: Maybe<Comment>;
   type: EventType;
 };
 
@@ -129,7 +129,7 @@ export type Post = {
 
 export type PostEvent = {
   __typename?: 'PostEvent';
-  data: Post;
+  data?: Maybe<Post>;
   type: EventType;
 };
 
@@ -325,7 +325,7 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type CommentEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentEvent'] = ResolversParentTypes['CommentEvent']> = {
-  data?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
+  data?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
 };
 
@@ -351,7 +351,7 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type PostEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['PostEvent'] = ResolversParentTypes['PostEvent']> = {
-  data?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+  data?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
 };
 

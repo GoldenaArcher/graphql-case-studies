@@ -33,7 +33,7 @@ extend type Mutation {
 
 type PostEvent {
   type: EventType!
-  data: Post!
+  data: Post
 }
 
 extend type Subscription {

@@ -1,11 +1,7 @@
-import type { Post, Comment } from "../../generated/graphql";
+import type { Post, Comment, EventType } from "../../generated/graphql";
 import type { pubsub } from "./pubsub";
 
-export type EventType = "CREATED" | "UPDATED" | "DELETED";
-type Entity = "comment" | "post";
-type PubSubKey = `${Entity}:${EventType}` | `${Entity}:${EventType}:${string}`;
-
-type EntityMap = {
+export type EntityMap = {
   comment: Comment;
   post: Post;
 };
@@ -16,13 +12,11 @@ export type EventPayload<T> = {
 };
 
 type GlobalPubSubEvents = {
-  [K in keyof EntityMap as `${K & string}:${EventType}`]: [
-    EventPayload<EntityMap[K]>
-  ];
+  [K in keyof EntityMap]: [EventPayload<EntityMap[K]>];
 };
 
 type ScopedPubSubEvents = {
-  [K in keyof EntityMap as `${K & string}:${EventType}:${string}`]: [
+  [K in keyof EntityMap as `${K & string}:${string}`]: [
     EventPayload<EntityMap[K]>
   ];
 };
