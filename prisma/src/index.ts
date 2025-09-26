@@ -9,9 +9,9 @@ import { schema } from "./graphql/schema";
 
 import type { GraphQLContext } from "./graphql/context/type";
 import { pubsub } from "./graphql/context/pubsub";
+import { createLoaders } from "./graphql/loaders";
 
 import { logger } from "./utils/logger";
-import prisma from "./prisma";
 
 const yogaApp = createYoga<GraphQLContext>({
   schema,
@@ -28,7 +28,7 @@ const yogaApp = createYoga<GraphQLContext>({
       );
     }
 
-    return { pubsub, requestId };
+    return { pubsub, requestId, loaders: createLoaders(), };
   },
   graphiql: {
     // Use WebSockets in GraphiQL

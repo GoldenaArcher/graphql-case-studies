@@ -18,6 +18,7 @@ input UpdateUserInput {
   name: String
   email: String
   age: Int
+  active: Boolean
 }
 
 extend type Query {

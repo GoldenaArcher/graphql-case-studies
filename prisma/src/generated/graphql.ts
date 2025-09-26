@@ -185,6 +185,7 @@ export type UpdatePostInput = {
 };
 
 export type UpdateUserInput = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
   age?: InputMaybe<Scalars['Int']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;

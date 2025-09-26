@@ -1,13 +1,15 @@
 import type { UserResolvers } from "../../../generated/graphql";
-
-import posts from "../post/data";
-import comments from "../comment/data";
+import type { GraphQLContext } from "../../context/type";
+import { mapDBCommentToComment } from "../comment/comment.mapper";
+import { mapDBPostToPost } from "../post/post.mapper";
 
 export const userResolvers: UserResolvers = {
-  posts(parent: any) {
-    return posts.filter((post) => post.author === parent.id) as any;
+  async posts(parent, _args, context: GraphQLContext) {
+    const posts = await context.loaders.postLoader.load(parent.id);
+    return posts.map(mapDBPostToPost);
   },
-  comments(parent: any) {
-    return comments.filter((comment) => comment.userId === parent.id) as any;
+  async comments(parent, _args, context: GraphQLContext) {
+    const comments = await context.loaders.commentLoader.load(parent.id);
+    return comments.map(mapDBCommentToComment);
   },
 };

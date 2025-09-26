@@ -1,4 +1,5 @@
 import type { Post, Comment, EventType } from "../../generated/graphql";
+import type { createLoaders } from "../loaders";
 import type { pubsub } from "./pubsub";
 
 export type EntityMap = {
@@ -29,4 +30,5 @@ export type PubSubEvents = {
 export type GraphQLContext = {
   pubsub: typeof pubsub;
   requestId?: string;
+  loaders: ReturnType<typeof createLoaders>;
 };

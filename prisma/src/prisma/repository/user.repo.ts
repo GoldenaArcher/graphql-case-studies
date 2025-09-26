@@ -1,5 +1,5 @@
-import type { User } from '../../../generated/prisma';
-import type { CreateUserInput } from '../../generated/graphql';
+import type { Prisma, User } from '../../../generated/prisma';
+import type { CreateUserInput, UpdateUserInput } from '../../generated/graphql';
 import prisma from '../index';
 
 const userRepository = prisma.user;
@@ -27,3 +27,54 @@ export const createUser = async (data: CreateUserInput): Promise<User> => {
         data,
     });
 }
+
+export const updateUser = async (id: string, data: UpdateUserInput): Promise<User> => {
+    if (!(await checkUserExist(id))) {
+        throw new Error('User not found');
+    }
+
+    if (data.email && await isEmailTaken(data.email)) {
+        throw new Error('Email already taken');
+    }
+
+    const payload: Prisma.UserUpdateInput = {};
+
+    if (data.name != null) {
+        payload.name = data.name;
+    }
+
+    if (data.email != null) {
+        payload.email = data.email;
+    }
+
+    if (data.age != null) {
+        payload.age = data.age;
+    }
+
+    if (data.active != null) {
+        payload.active = data.active;
+    }
+
+    return await userRepository.update({
+        where: { id },
+        data: payload,
+    });
+}
+
+export const deactivateUser = async (id: string): Promise<User> => {
+    return updateUser(id, { active: false });
+}
+
+export const getUsers = async (query?: string): Promise<User[]> => {
+    return await prisma.user.findMany({
+        where: {
+            active: true,
+            ...(query && {
+                name: {
+                    contains: query,
+                    mode: "insensitive",
+                },
+            }),
+        },
+    });
+};
