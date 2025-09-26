@@ -1,0 +1,82 @@
+[
+  {
+    "id": "902a9f53-65c1-4d9e-b9c7-75b8acbdee65",
+    "text": "Great post!",
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": false,
+    "archived": true
+  },
+  {
+    "id": "c3cb02ae-8dd1-422b-8fe4-67a7d5cd3b4f",
+    "text": "Thanks for sharing.",
+    "authorId": "79e3e28a-4964-4d84-a772-df251e1ed04d",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "5b7a33d9-c6ce-4d95-837f-46ff3b16c6fa",
+    "text": "Interesting read.",
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "postId": "4acb6576-21be-4621-a891-0ae60ebdbd99",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "2c61b084-7a71-408a-9f57-e9442b62f29f",
+    "text": "I learned something new.",
+    "authorId": "79e3e28a-4964-4d84-a772-df251e1ed04d",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "3a87ebf4-35d3-4fe2-a67b-1165037c13cc",
+    "text": "Looking forward to more content.",
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "91a47e4c-11f9-4e3e-94c2-40201543f3ec",
+    "text": "Well written!",
+    "authorId": "79e3e28a-4964-4d84-a772-df251e1ed04d",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "0b60f865-97dc-4c29-b9c0-1c43e29fcf02",
+    "text": "This was very helpful.",
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "postId": "4acb6576-21be-4621-a891-0ae60ebdbd99",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "d24fa0a0-b314-417b-b91f-c0e02df2039f",
+    "text": "I disagree with some points.",
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": false,
+    "archived": false
+  },
+  {
+    "id": "a8b5fbd6-20de-4f87-bb38-b720f37a2f83",
+    "text": "Can you elaborate more?",
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "postId": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "orphaned": true,
+    "archived": false
+  },
+  {
+    "id": "7beedc2b-3907-4535-a0d4-730a8d2c3a2a",
+    "text": "Awesome!",
+    "authorId": "79e3e28a-4964-4d84-a772-df251e1ed04d",
+    "postId": "4acb6576-21be-4621-a891-0ae60ebdbd99",
+    "orphaned": false,
+    "archived": false
+  }
+]

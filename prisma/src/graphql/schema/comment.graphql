@@ -1,0 +1,35 @@
+type Comment {
+  id: ID!
+  text: String!
+  author: User
+  post: Post
+}
+
+input CreateCommentInput {
+  text: String!
+  author: ID!
+  post: ID!
+}
+
+input UpdateCommentInput {
+  text: String
+}
+
+extend type Query {
+  comments(query: String): [Comment]!
+}
+
+extend type Mutation {
+  createComment(data: CreateCommentInput!): Comment!
+  deleteComment(id: ID!): Boolean!
+  updateComment(id: ID!, data: UpdateCommentInput!): Comment!
+}
+
+type CommentEvent {
+  type: EventType!
+  data: Comment
+}
+
+extend type Subscription {
+  comment(postId: ID!): CommentEvent!
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "6ff3f38b-06cb-4a49-872d-028b8302cb0f",
+    "title": "My first post",
+    "body": "Hello world!",
+    "published": true,
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "archived": false
+  },
+  {
+    "id": "4acb6576-21be-4621-a891-0ae60ebdbd99",
+    "title": "GraphQL is awesome",
+    "body": "Let's learn GraphQL",
+    "published": false,
+    "authorId": "dc1903e2-becf-4a25-9356-5f11756cb70e",
+    "archived": true
+  },
+  {
+    "id": "e7bb8ff5-b7c9-4306-9e6e-8decb0463ee7",
+    "title": "Advanced TypeScript",
+    "body": "TypeScript generics and more",
+    "published": true,
+    "authorId": "79e3e28a-4964-4d84-a772-df251e1ed04d",
+    "archived": false
+  }
+]
