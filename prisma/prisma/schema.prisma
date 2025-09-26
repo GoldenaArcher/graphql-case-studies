@@ -30,7 +30,7 @@ model Post {
   body      String
   published Boolean   @default(false)
   archived  Boolean   @default(false)
-  User      User      @relation(fields: [author], references: [id])
+  user      User      @relation(fields: [author], references: [id])
   author    String
   comments   Comment[]
 }
@@ -42,6 +42,6 @@ model Comment {
   archived Boolean @default(false)
   Post     Post    @relation(fields: [postId], references: [id])
   postId   String
-  User     User    @relation(fields: [userId], references: [id])
+  user     User    @relation(fields: [userId], references: [id])
   userId   String
 }

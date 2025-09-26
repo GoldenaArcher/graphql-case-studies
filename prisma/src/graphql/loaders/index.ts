@@ -1,9 +1,16 @@
-import { postLoader } from './post.loader';
-import { commentLoader } from './comment.loader';
+import { postByCommentLoader, postByUserLoader } from './post.loader';
+import { commentByPostLoader, commentByUserLoader } from './comment.loader';
+import { userByCommentLoader, userByPostLoader } from './user.loader';
 
 export function createLoaders() {
     return {
-        postLoader: postLoader(),
-        commentLoader: commentLoader(),
+        postByUserLoader: postByUserLoader(),
+        postByCommentLoader: postByCommentLoader(),
+
+        commentByUserLoader: commentByUserLoader(),
+        commentByPostLoader: commentByPostLoader(),
+        
+        userByPostLoader: userByPostLoader(),
+        userByCommentLoader: userByCommentLoader(),
     };
 }

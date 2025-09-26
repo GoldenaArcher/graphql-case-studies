@@ -1,24 +1,26 @@
-import DataLoader from 'dataloader';
 import prisma from '../../prisma';
+import { createBatchLoader } from '../../utils/loadder';
 
-export const commentLoader = () =>
-    new DataLoader(async (userIds: readonly string[]) => {
-        const comments = await prisma.comment.findMany({
-            where: {
-                userId: { in: [...userIds] },
-            },
-        });
+export const commentByUserLoader = () =>
+    createBatchLoader(
+        async (userIds: readonly string[]) => {
+            return prisma.comment.findMany({
+                where: {
+                    userId: { in: [...userIds] },
+                },
+            });
+        },
+        (comment) => comment.userId
+    )
 
-        const commentMap: Record<string, typeof comments> = {};
-        for (const userId of userIds) {
-            commentMap[userId] = [];
-        }
-
-        for (const comment of comments) {
-            if (comment.userId) {
-                commentMap[comment.userId]?.push(comment);
-            }
-        }
-
-        return userIds.map((userId) => commentMap[userId] || []);
-    });
+export const commentByPostLoader = () =>
+    createBatchLoader(
+        async (postIds: readonly string[]) => {
+            return prisma.comment.findMany({
+                where: {
+                    postId: { in: [...postIds] },
+                },
+            });
+        },
+        (comment) => comment.postId
+    )
