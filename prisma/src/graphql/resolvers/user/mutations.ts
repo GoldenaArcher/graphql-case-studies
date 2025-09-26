@@ -5,26 +5,18 @@ import type {
   MutationUpdateUserArgs,
   User,
 } from "../../../generated/graphql";
+import { createUser } from "../../../prisma/repository/user.repo";
 
-import users, { deactivateUser, updateUser } from "./data";
+import { deactivateUser, updateUser } from "./data";
+import { mapNewUserToUser } from "./user.mappers";
 
 export const userMutations: Pick<
   MutationResolvers,
   "createUser" | "deleteUser" | "updateUser"
 > = {
-  createUser: (_parent, { data }: MutationCreateUserArgs) => {
-    const isEmailTaken = users.some((user) => user.email === data.email);
-    if (isEmailTaken) {
-      throw new Error("Email is already taken");
-    }
-
-    const newUser = {
-      id: crypto.randomUUID(),
-      active: false,
-      ...data,
-    } as User;
-    users.push(newUser);
-    return newUser;
+  createUser: async (_parent, { data }: MutationCreateUserArgs) => {
+    const dbUser = await createUser(data);
+    return mapNewUserToUser(dbUser);
   },
   deleteUser: (_parent, { id }: MutationDeleteUserArgs) => {
     deactivateUser(id);

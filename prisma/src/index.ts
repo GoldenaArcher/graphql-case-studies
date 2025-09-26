@@ -11,6 +11,7 @@ import type { GraphQLContext } from "./graphql/context/type";
 import { pubsub } from "./graphql/context/pubsub";
 
 import { logger } from "./utils/logger";
+import prisma from "./prisma";
 
 const yogaApp = createYoga<GraphQLContext>({
   schema,
@@ -86,3 +87,22 @@ httpServer.listen(port, () => {
 });
 
 // startMockCountPublisher();
+
+// prisma.user.findMany({
+//   include: {
+//     posts: true,
+//   }
+// }).then(users => {
+//     logger.info({ users }, 'Users found');
+// });
+
+// prisma.post.create({
+//   data: {
+//     title: 'My first post',
+//     body: 'Hello world!',
+//     published: true,
+//     author: 'dc1903e2-becf-4a25-9356-5f11756cb70e',
+//   }
+// }).then(post => {
+//   logger.info({ post }, 'Post created');
+// });
