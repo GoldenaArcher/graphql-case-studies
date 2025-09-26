@@ -11,7 +11,7 @@
     "id": "2",
     "title": "GraphQL is awesome",
     "body": "Let's learn GraphQL",
-    "userId": "1",
+    "author": "1",
     "published": false,
     "archived": true
   },

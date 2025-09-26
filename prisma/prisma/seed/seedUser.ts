@@ -1,19 +1,33 @@
-import prisma from "../../src/prisma";
-import users from "./data/users.json";
+import users from './data/users.json';
+import { PrismaClient } from '../../generated/prisma/client';
 
-async function main() {
-  await prisma.user.createMany({
-    data: users
+const prisma = new PrismaClient();
+
+export default async function seedUser() {
+  console.log('🌱 Start seeding users...');
+
+  const existingUsers = await prisma.user.findMany({
+    where: {
+      id: { in: users.map(u => u.id) }
+    },
+    select: { id: true }
   });
-}
 
-main()
-  .then(() => {
-    console.log('✅ Users seeded');
-    return prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
+  const existingIds = new Set(existingUsers.map(u => u.id));
+  const newUsers = users.filter(u => !existingIds.has(u.id));
+
+  if (newUsers.length === 0) {
+    console.log('✅ No new users to insert.');
     await prisma.$disconnect();
-    process.exit(1);
+    return;
+  }
+
+  const result = await prisma.user.createMany({
+    data: newUsers,
+    skipDuplicates: true,
   });
+
+  console.log(`✅ Inserted ${result.count} new users`);
+  await prisma.$disconnect();
+  console.log('🌱 Done seeding users.\n');
+}
