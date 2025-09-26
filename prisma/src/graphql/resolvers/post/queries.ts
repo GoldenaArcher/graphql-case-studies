@@ -1,23 +1,8 @@
-import type { Post, QueryResolvers, User } from "../../../generated/graphql";
-import posts from "./data";
+import type { Post, QueryResolvers } from "../../../generated/graphql";
+import { findPostById, findPosts } from "../../../prisma/repository/post.repo";
+import { mapDBPostToPost } from "./post.mapper";
 
 export const postQueries: Pick<QueryResolvers, "post" | "posts"> = {
-  post: () => ({
-    id: "1",
-    title: "My first post",
-    body: "Hello world!",
-    published: true,
-    author: {} as User,
-    comments: [],
-  }),
-  posts: (_parent, { query }): Post[] => {
-    if (!query)
-      return posts.filter((post) => !post.archived) as unknown as Post[];
-    return posts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(query.toLowerCase()) ||
-        (post.body.toLowerCase().includes(query.toLowerCase()) &&
-          !post.archived)
-    ) as unknown as Post[];
-  },
+  post: async (_parent, { id }): Promise<Post> => mapDBPostToPost(await findPostById(id)),
+  posts: async (_parent, { query }): Promise<Post[]> => (await findPosts(query ?? undefined)).map(mapDBPostToPost),
 };

@@ -4,9 +4,16 @@ import prisma from '../index';
 
 const userRepository = prisma.user;
 
-export const checkUserExist = async (id: string) => {
+export const checkUserExists = async (id: string) => {
     return !!(await userRepository.findUnique({
         where: { id, },
+        select: { id: true },
+    }));
+}
+
+export const checkUserExistsAndIsActive = async (id: string) => {
+    return !!(await userRepository.findUnique({
+        where: { id, active: true },
         select: { id: true },
     }));
 }
@@ -29,7 +36,7 @@ export const createUser = async (data: CreateUserInput): Promise<User> => {
 }
 
 export const updateUser = async (id: string, data: UpdateUserInput): Promise<User> => {
-    if (!(await checkUserExist(id))) {
+    if (!(await checkUserExists(id))) {
         throw new Error('User not found');
     }
 
@@ -61,11 +68,15 @@ export const updateUser = async (id: string, data: UpdateUserInput): Promise<Use
     });
 }
 
+export const activateUser = async (id: string): Promise<User> => {
+    return updateUser(id, { active: true });
+}
+
 export const deactivateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: false });
 }
 
-export const getUsers = async (query?: string): Promise<User[]> => {
+export const findUsers = async (query?: string): Promise<User[]> => {
     return await prisma.user.findMany({
         where: {
             active: true,

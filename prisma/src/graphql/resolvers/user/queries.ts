@@ -3,7 +3,7 @@ import type {
   QueryUsersArgs,
   User,
 } from "../../../generated/graphql";
-import { getUsers } from "../../../prisma/repository/user.repo";
+import { findUsers } from "../../../prisma/repository/user.repo";
 import { mapDBUserToUser } from "./user.mappers";
 
 
@@ -16,6 +16,6 @@ export const userQueries: Pick<QueryResolvers, "me" | "users"> = {
     age: 30,
   } as User),
   users: async (_parent, { query }: Partial<QueryUsersArgs>): Promise<User[]> => {
-    return (await getUsers(query ?? undefined)).map(mapDBUserToUser);
+    return (await findUsers(query ?? undefined)).map(mapDBUserToUser);
   },
 };

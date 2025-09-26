@@ -1,77 +1,68 @@
 import type {
   MutationCreatePostArgs,
   MutationDeletePostArgs,
+  MutationPublishPostArgs,
   MutationResolvers,
   MutationUpdatePostArgs,
-  Post,
 } from "../../../generated/graphql";
 import type { GraphQLContext } from "../../context/type";
 
-import posts, { archivePost, updatePost } from "./data";
-import users from "../user/data";
-
 import { postLogger } from "../../../utils/logger";
+
+import { createPost, archivePost, updatePost, publishPost } from "../../../prisma/repository/post.repo";
+import { mapDBPostToPost } from "./post.mapper";
 
 export const postMutations: Pick<
   MutationResolvers,
-  "createPost" | "deletePost" | "updatePost"
+  "createPost" | "deletePost" | "updatePost" | "publishPost"
 > = {
-  createPost: (
+  createPost: async (
     _parent,
     { data }: MutationCreatePostArgs,
     { pubsub }: GraphQLContext
   ) => {
-    const userExists = users.some((user) => user.id === data.author);
-    if (!userExists) {
-      throw new Error("User not found");
-    }
-
-    const newPost = {
-      id: crypto.randomUUID(),
-      ...data,
-      archived: false,
-      published: true,
-    };
-    posts.push(newPost);
+    const dbPost = await createPost(data);
+    const newPost = mapDBPostToPost(dbPost);
 
     postLogger.info({ post: newPost }, "Post created");
 
-    pubsub.publish(`post:CREATED`, {
+    pubsub.publish(`post`, {
       type: `CREATED`,
-      data: newPost as unknown as Post,
+      data: newPost,
     });
 
     postLogger.info(
       {
         createdPost: {
           type: `CREATED`,
-          data: newPost as unknown as Post,
+          data: newPost
         },
       },
       "Publishing to post:CREATED"
     );
 
-    return newPost as unknown as Post;
+    return newPost;
   },
-  deletePost: (
+  deletePost: async (
     _parent,
     { id }: MutationDeletePostArgs,
     { pubsub }: GraphQLContext
   ) => {
-    const archivedPost = archivePost(id);
+    const dbPost = await archivePost(id);
+    const archivedPost = mapDBPostToPost(dbPost);
 
-    postLogger.info({ post: archivedPost }, "Post archived");
+    postLogger.info({ post: dbPost }, "Post archived");
 
-    pubsub.publish(`post:DELETED`, {
+    pubsub.publish(`post`, {
       type: `DELETED`,
-      data: archivedPost as unknown as Post,
+      data: archivedPost,
     });
 
     postLogger.info(
       {
         deletedPost: {
           type: `DELETED`,
-          data: archivedPost as unknown as Post,
+          data: archivedPost
         },
       },
       "Publishing to post:DELETED"
@@ -79,16 +70,17 @@ export const postMutations: Pick<
 
     return true;
   },
-  updatePost: (
+  updatePost: async (
     _parent,
     { id, data }: MutationUpdatePostArgs,
     { pubsub }: GraphQLContext
   ) => {
-    const updatedPost = updatePost(id, data) as unknown as Post;
+    const dbPost = await updatePost(id, data);
+    const updatedPost = mapDBPostToPost(dbPost);
 
     postLogger.info({ post: updatedPost }, "Post updated");
 
-    pubsub.publish(`post:UPDATED`, {
+    pubsub.publish(`post`, {
       type: `UPDATED`,
       data: updatedPost,
     });
@@ -104,5 +96,32 @@ export const postMutations: Pick<
     );
 
     return updatedPost;
+  },
+  publishPost: async (
+    _parent,
+    { id }: MutationPublishPostArgs,
+    { pubsub }: GraphQLContext
+  ) => {
+    const dbPost = await publishPost(id);
+    const publishedPost = mapDBPostToPost(dbPost);
+
+    postLogger.info({ post: publishedPost }, "Post published");
+
+    pubsub.publish(`post`, {
+      type: `UPDATED`,
+      data: publishedPost,
+    });
+
+    postLogger.info(
+      {
+        publishedPost: {
+          type: `UPDATED`,
+          data: publishedPost,
+        },
+      },
+      "Publishing to post:PUBLISHED"
+    );
+
+    return publishedPost;
   },
 };

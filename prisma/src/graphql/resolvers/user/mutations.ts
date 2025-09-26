@@ -1,18 +1,23 @@
 import type {
+  MutationActivateUserArgs,
   MutationCreateUserArgs,
   MutationDeleteUserArgs,
   MutationResolvers,
   MutationUpdateUserArgs,
 } from "../../../generated/graphql";
-import { createUser, updateUser, deactivateUser } from "../../../prisma/repository/user.repo";
+import { createUser, updateUser, deactivateUser, activateUser } from "../../../prisma/repository/user.repo";
 import { mapDBUserToUser } from "./user.mappers";
 
 export const userMutations: Pick<
   MutationResolvers,
-  "createUser" | "deleteUser" | "updateUser"
+  "createUser" | "deleteUser" | "updateUser" | "activateUser"
 > = {
   createUser: async (_parent, { data }: MutationCreateUserArgs) => {
     const dbUser = await createUser(data);
+    return mapDBUserToUser(dbUser);
+  },
+  activateUser: async (_parent, { id }: MutationActivateUserArgs) => {
+    const dbUser = await activateUser(id);
     return mapDBUserToUser(dbUser);
   },
   deleteUser: (_parent, { id }: MutationDeleteUserArgs) => {

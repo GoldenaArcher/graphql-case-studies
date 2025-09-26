@@ -30,4 +30,5 @@ extend type Mutation {
   createUser(data: CreateUserInput!): User!
   deleteUser(id: ID!): Boolean!
   updateUser(id: ID!, data: UpdateUserInput!): User!
+  activateUser(id: ID!): User!
 }

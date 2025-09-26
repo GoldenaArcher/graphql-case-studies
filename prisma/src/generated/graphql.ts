@@ -39,7 +39,6 @@ export type CreateCommentInput = {
 export type CreatePostInput = {
   author: Scalars['ID']['input'];
   body: Scalars['String']['input'];
-  published: Scalars['Boolean']['input'];
   title: Scalars['String']['input'];
 };
 
@@ -58,15 +57,22 @@ export const EventType = {
 export type EventType = typeof EventType[keyof typeof EventType];
 export type Mutation = {
   __typename?: 'Mutation';
+  activateUser: User;
   createComment: Comment;
   createPost: Post;
   createUser: User;
   deleteComment: Scalars['Boolean']['output'];
   deletePost: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  publishPost: Post;
   updateComment: Comment;
   updatePost: Post;
   updateUser: User;
+};
+
+
+export type MutationActivateUserArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -96,6 +102,11 @@ export type MutationDeletePostArgs = {
 
 
 export type MutationDeleteUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationPublishPostArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -179,6 +190,7 @@ export type UpdateCommentInput = {
 };
 
 export type UpdatePostInput = {
+  archive?: InputMaybe<Scalars['Boolean']['input']>;
   body?: InputMaybe<Scalars['String']['input']>;
   published?: InputMaybe<Scalars['Boolean']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -331,12 +343,14 @@ export type CommentEventResolvers<ContextType = any, ParentType extends Resolver
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  activateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationActivateUserArgs, 'id'>>;
   createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'data'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'data'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'data'>>;
   deleteComment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteCommentArgs, 'id'>>;
   deletePost?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePostArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
+  publishPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationPublishPostArgs, 'id'>>;
   updateComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationUpdateCommentArgs, 'data' | 'id'>>;
   updatePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationUpdatePostArgs, 'data' | 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'data' | 'id'>>;

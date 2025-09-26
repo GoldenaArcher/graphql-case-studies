@@ -10,7 +10,6 @@ type Post {
 input CreatePostInput {
   title: String!
   body: String!
-  published: Boolean!
   author: ID!
 }
 
@@ -18,6 +17,7 @@ input UpdatePostInput {
   title: String
   body: String
   published: Boolean
+  archive: Boolean
 }
 
 extend type Query {
@@ -29,6 +29,7 @@ extend type Mutation {
   createPost(data: CreatePostInput!): Post!
   deletePost(id: ID!): Boolean!
   updatePost(id: ID!, data: UpdatePostInput!): Post!
+  publishPost(id: ID!): Post!
 }
 
 type PostEvent {
