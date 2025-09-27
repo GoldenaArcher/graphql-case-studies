@@ -1,5 +1,5 @@
 import type { Prisma, User } from '../../../generated/prisma';
-import type { CreateUserInput, UpdateUserInput } from '../../generated/graphql';
+import type { CreateUserInput, UpdateUserInput, UserWhereInput } from '../../generated/graphql';
 import prisma from '../index';
 
 const userRepository = prisma.user;
@@ -76,16 +76,18 @@ export const deactivateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: false });
 }
 
-export const findUsers = async (query?: string): Promise<User[]> => {
+export const findUsers = async (where?: UserWhereInput): Promise<User[]> => {
+    const cleaned = {
+        active: true,
+        AND: where?.AND ?? undefined,
+        OR: where?.OR ?? undefined,
+        NOT: where?.NOT ?? undefined,
+        age: where?.age ?? undefined,
+        email: where?.email ?? undefined,
+        name: where?.name ?? undefined,
+    } as Prisma.UserWhereInput;
+
     return await prisma.user.findMany({
-        where: {
-            active: true,
-            ...(query && {
-                name: {
-                    contains: query,
-                    mode: "insensitive",
-                },
-            }),
-        },
+        where: cleaned,
     });
 };

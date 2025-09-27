@@ -15,7 +15,7 @@ export const userQueries: Pick<QueryResolvers, "me" | "users"> = {
     email: "alice@example.com",
     age: 30,
   } as User),
-  users: async (_parent, { query }: Partial<QueryUsersArgs>): Promise<User[]> => {
-    return (await findUsers(query ?? undefined)).map(mapDBUserToUser);
+  users: async (_parent, { where }: Partial<QueryUsersArgs>): Promise<User[]> => {
+    return (await findUsers(where ?? undefined)).map(mapDBUserToUser);
   },
 };

@@ -20,8 +20,18 @@ input UpdatePostInput {
   archive: Boolean
 }
 
+input PostWhereInput {
+  title: StringFilter
+  body: StringFilter
+  published: Boolean
+  archive: Boolean
+  AND: [PostWhereInput!]
+  OR: [PostWhereInput!]
+  NOT: [PostWhereInput!]
+}
+
 extend type Query {
-  posts(query: String): [Post]!
+  posts(where: PostWhereInput): [Post]!
   post(id: ID!): Post!
 }
 

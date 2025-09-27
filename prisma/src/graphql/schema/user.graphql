@@ -21,8 +21,18 @@ input UpdateUserInput {
   active: Boolean
 }
 
+input UserWhereInput {
+  name: StringFilter
+  email: StringFilter
+  active: Boolean
+  age: Int
+  AND: [UserWhereInput!]
+  OR: [UserWhereInput!]
+  NOT: [UserWhereInput!]
+}
+
 extend type Query {
-  users(query: String): [User]!
+  users(where: UserWhereInput): [User]!
   me: User!
 }
 

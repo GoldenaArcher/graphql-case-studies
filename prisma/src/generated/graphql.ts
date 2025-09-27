@@ -146,6 +146,16 @@ export type PostEvent = {
   type: EventType;
 };
 
+export type PostWhereInput = {
+  AND?: InputMaybe<Array<PostWhereInput>>;
+  NOT?: InputMaybe<Array<PostWhereInput>>;
+  OR?: InputMaybe<Array<PostWhereInput>>;
+  archive?: InputMaybe<Scalars['Boolean']['input']>;
+  body?: InputMaybe<StringFilter>;
+  published?: InputMaybe<Scalars['Boolean']['input']>;
+  title?: InputMaybe<StringFilter>;
+};
+
 export type Query = {
   __typename?: 'Query';
   comments: Array<Maybe<Comment>>;
@@ -167,12 +177,26 @@ export type QueryPostArgs = {
 
 
 export type QueryPostsArgs = {
-  query?: InputMaybe<Scalars['String']['input']>;
+  where?: InputMaybe<PostWhereInput>;
 };
 
 
 export type QueryUsersArgs = {
-  query?: InputMaybe<Scalars['String']['input']>;
+  where?: InputMaybe<UserWhereInput>;
+};
+
+export const QueryMode = {
+  Default: 'default',
+  Insensitive: 'insensitive'
+} as const;
+
+export type QueryMode = typeof QueryMode[keyof typeof QueryMode];
+export type StringFilter = {
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  equals?: InputMaybe<Scalars['String']['input']>;
+  mode?: InputMaybe<QueryMode>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Subscription = {
@@ -216,6 +240,16 @@ export type User = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   posts: Array<Maybe<Post>>;
+};
+
+export type UserWhereInput = {
+  AND?: InputMaybe<Array<UserWhereInput>>;
+  NOT?: InputMaybe<Array<UserWhereInput>>;
+  OR?: InputMaybe<Array<UserWhereInput>>;
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  age?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<StringFilter>;
+  name?: InputMaybe<StringFilter>;
 };
 
 
@@ -303,13 +337,17 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Post: ResolverTypeWrapper<Post>;
   PostEvent: ResolverTypeWrapper<PostEvent>;
+  PostWhereInput: PostWhereInput;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  QueryMode: QueryMode;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  StringFilter: StringFilter;
   Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
   UpdateCommentInput: UpdateCommentInput;
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
   User: ResolverTypeWrapper<User>;
+  UserWhereInput: UserWhereInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -325,13 +363,16 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   Post: Post;
   PostEvent: PostEvent;
+  PostWhereInput: PostWhereInput;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
+  StringFilter: StringFilter;
   Subscription: Record<PropertyKey, never>;
   UpdateCommentInput: UpdateCommentInput;
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
   User: User;
+  UserWhereInput: UserWhereInput;
 };
 
 export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {

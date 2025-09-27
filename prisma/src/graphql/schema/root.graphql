@@ -7,3 +7,16 @@ enum EventType {
   UPDATED
   DELETED
 }
+
+input StringFilter {
+  equals: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  mode: QueryMode
+}
+
+enum QueryMode {
+  default
+  insensitive
+}

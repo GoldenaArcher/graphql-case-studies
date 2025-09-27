@@ -1,5 +1,5 @@
 import type { Post, Prisma } from '../../../generated/prisma';
-import type { CreatePostInput, UpdatePostInput } from '../../generated/graphql';
+import type { CreatePostInput, PostWhereInput, UpdatePostInput } from '../../generated/graphql';
 import prisma from '../index';
 import { orphanComment } from './comment.repo';
 import { checkUserExistsAndIsActive } from './user.repo';
@@ -30,16 +30,22 @@ export const findPostById = async (postId: string): Promise<Post> => {
     return post;
 }
 
-export const findPosts = async (query?: string): Promise<Post[]> => {
+export const findPosts = async (where?: PostWhereInput): Promise<Post[]> => {
+    const cleaned = {
+        published: true,
+        ...(where && {
+            title: where.title?.contains ?? undefined,
+            body: where.body?.contains ?? undefined,
+            published: where.published ?? undefined,
+            archive: where.archive ?? undefined,
+            AND: where.AND ?? undefined,
+            OR: where.OR ?? undefined,
+            NOT: where.NOT ?? undefined,
+        }),
+    } as Prisma.PostWhereInput;
+
     return await prisma.post.findMany({
-        where: {
-            published: true,
-            ...(query && {
-                title: {
-                    contains: query,
-                },
-            }),
-        },
+        where: cleaned,
     });
 }
 
