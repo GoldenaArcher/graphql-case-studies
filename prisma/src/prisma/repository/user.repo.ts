@@ -1,5 +1,6 @@
 import type { Prisma, User } from '../../../generated/prisma';
 import type { CreateUserInput, UpdateUserInput, UserWhereInput } from '../../generated/graphql';
+import { hashPassword } from '../../utils/auth';
 import prisma from '../index';
 
 const userRepository = prisma.user;
@@ -30,8 +31,13 @@ export const createUser = async (data: CreateUserInput): Promise<User> => {
         throw new Error('Email already taken');
     }
 
+    const payload: Prisma.UserCreateInput = {
+        ...data,
+        password: await hashPassword(data.password),
+    };
+
     return await userRepository.create({
-        data,
+        data: payload,
     });
 }
 

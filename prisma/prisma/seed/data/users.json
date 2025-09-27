@@ -4,20 +4,23 @@
     "name": "Alice",
     "email": "alice@example.com",
     "age": 30,
-    "active": true
+    "active": true,
+    "password": "123456"
   },
   {
     "id": "79e3e28a-4964-4d84-a772-df251e1ed04d",
     "name": "Bob",
     "email": "bob@example.com",
     "age": 25,
-    "active": false
+    "active": false,
+    "password": "123456"
   },
   {
     "id": "cf136450-1ef9-4b6e-b10c-d8316b4f8c72",
     "name": "Charlie",
     "email": "charlie@example.com",
     "age": 40,
-    "active": true
+    "active": true,
+    "password": "123456"
   }
 ]

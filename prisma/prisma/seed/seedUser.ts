@@ -1,5 +1,6 @@
 import users from './data/users.json';
 import { PrismaClient } from '../../generated/prisma/client';
+import { hashPassword } from '../../src/utils/auth';
 
 const prisma = new PrismaClient();
 
@@ -14,7 +15,10 @@ export default async function seedUser() {
   });
 
   const existingIds = new Set(existingUsers.map(u => u.id));
-  const newUsers = users.filter(u => !existingIds.has(u.id));
+  const newUsers = await Promise.all(users.filter(u => !existingIds.has(u.id)).map(async (u) => ({
+    ...u,
+    password: await hashPassword(u.password)
+  })));
 
   if (newUsers.length === 0) {
     console.log('✅ No new users to insert.');

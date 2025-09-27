@@ -48,6 +48,7 @@ export type CreateUserInput = {
   age?: InputMaybe<Scalars['Int']['input']>;
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 export const EventType = {
