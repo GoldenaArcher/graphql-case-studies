@@ -14,9 +14,20 @@ export const postByUserLoader = () =>
 export const postByCommentLoader = () =>
     createBatchLoader(
         async (commentIds: readonly string[]) => {
-            return await prisma.post.findMany({
-                where: { author: { in: [...commentIds] } },
+            const comments = await prisma.comment.findMany({
+                where: {
+                    id: { in: [...commentIds] },
+                },
+                include: {
+                    post: true,
+                },
             });
-        },
-        (post) => post.id
+
+            return comments
+                .filter((comment) => comment.post !== null)
+                .map((comment) => ({
+                    key: comment.id,
+                    value: comment.post!,
+                }));
+        }
     );

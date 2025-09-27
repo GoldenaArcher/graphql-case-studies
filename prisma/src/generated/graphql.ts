@@ -18,8 +18,10 @@ export type Scalars = {
 
 export type Comment = {
   __typename?: 'Comment';
+  archived?: Maybe<Scalars['Boolean']['output']>;
   author?: Maybe<User>;
   id: Scalars['ID']['output'];
+  orphaned?: Maybe<Scalars['Boolean']['output']>;
   post?: Maybe<Post>;
   text: Scalars['String']['output'];
 };
@@ -186,6 +188,8 @@ export type SubscriptionCommentArgs = {
 };
 
 export type UpdateCommentInput = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  orphaned?: InputMaybe<Scalars['Boolean']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -331,8 +335,10 @@ export type ResolversParentTypes = {
 };
 
 export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
+  archived?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   author?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  orphaned?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };

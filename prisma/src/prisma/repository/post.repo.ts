@@ -1,12 +1,20 @@
 import type { Post, Prisma } from '../../../generated/prisma';
 import type { CreatePostInput, UpdatePostInput } from '../../generated/graphql';
 import prisma from '../index';
+import { orphanComment } from './comment.repo';
 import { checkUserExistsAndIsActive } from './user.repo';
 
 export const checkPostExists = async (postId: string) => {
     return !!(await prisma.post.findUnique({
         where: { id: postId },
         select: { id: true },
+    }));
+}
+
+export const checkPostIsPublished = async (postId: string) => {
+    return !!(await prisma.post.findUnique({
+        where: { id: postId },
+        select: { published: true },
     }));
 }
 
@@ -81,7 +89,16 @@ export const updatePost = async (postId: string, data: UpdatePostInput): Promise
 }
 
 export const archivePost = async (postId: string): Promise<Post> => {
-    return updatePost(postId, { archive: true });
+    const post = await findPostById(postId);
+
+    if (!post || post.archived || !post.published) {
+        throw new Error('Post does not exist.');
+    }
+
+    const archivedPost = await updatePost(postId, { archive: true });
+    await orphanComment(postId);
+
+    return archivedPost;
 }
 
 export const publishPost = async (postId: string): Promise<Post> => {

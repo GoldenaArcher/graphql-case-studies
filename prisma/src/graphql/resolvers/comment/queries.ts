@@ -1,9 +1,9 @@
 import type { QueryResolvers } from "../../../generated/graphql";
-
-import comments from "./data";
+import { findAvailableComments } from "../../../prisma/repository/comment.repo";
+import { mapDBCommentToComment } from "./comment.mapper";
 
 export const commentQueries: Pick<QueryResolvers, "comments"> = {
-  comments: () => {
-    return comments.filter((comment) => !comment.archived) as any;
+  comments: async () => {
+    return (await findAvailableComments()).map(mapDBCommentToComment);
   },
 };

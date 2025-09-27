@@ -5,60 +5,51 @@ import type {
   MutationUpdateCommentArgs,
 } from "../../../generated/graphql";
 
-import comments, { archiveComment, updateComment } from "./data";
-import posts from "../post/data";
-import users from "../user/data";
-
 import type { GraphQLContext } from "../../context/type";
 import { commentLogger } from "../../../utils/logger";
+
+import { createComment, updateComment, archiveComment } from "../../../prisma/repository/comment.repo";
+import { mapDBCommentToComment } from "./comment.mapper";
 
 export const commentMutations: Pick<
   MutationResolvers,
   "createComment" | "deleteComment" | "updateComment"
 > = {
-  createComment: (
+  createComment: async (
     _parent,
     { data: { text, author, post } }: MutationCreateCommentArgs,
     { pubsub }: GraphQLContext
   ) => {
-    const userExists = users.some((user) => user.id === author);
-    const postExists = posts.some((p) => p.id === post && p.published);
-
-    if (!userExists) throw new Error("User not found");
-    if (!postExists) throw new Error("Post not found");
-
-    const newComment = {
-      id: crypto.randomUUID(),
+    const dbComment = await createComment({
       text,
-      userId: author,
-      postId: post,
-      orphaned: false,
-      archived: false,
-    };
+      author,
+      post,
+    });
+    const newComment = mapDBCommentToComment(dbComment);
 
-    comments.push(newComment);
-    commentLogger.info({ commentId: newComment.id }, "Comment created");
+    commentLogger.info({ comment: newComment }, "Comment created");
 
     pubsub.publish(`comment:${post}`, {
       type: "CREATED",
-      data: newComment as any,
+      data: newComment
     });
     commentLogger.info(
-      { commentId: newComment.id },
+      { comment: newComment },
       `Comment published to comment:CREATED:${post}`
     );
 
     return newComment;
   },
-  deleteComment: (
+  deleteComment: async (
     _parent,
     { id }: MutationDeleteCommentArgs,
     { pubsub }: GraphQLContext
   ) => {
-    const deletedComment = archiveComment(id);
+    const dbComment = await archiveComment(id);
+    const deletedComment = mapDBCommentToComment(dbComment);
     commentLogger.info({ comment: deletedComment }, "Comment deleted");
 
-    pubsub.publish(`comment:${deletedComment.postId}`, {
+    pubsub.publish(`comment:${dbComment.postId}`, {
       type: "DELETED",
       data: deletedComment,
     });
@@ -69,19 +60,21 @@ export const commentMutations: Pick<
           data: deletedComment,
         },
       },
-      `Comment published to comment:DELETED:${deletedComment.postId}`
+      `Comment published to comment:DELETED:${dbComment.postId}`
     );
     return true;
   },
-  updateComment: (
+  updateComment: async (
     _parent,
     { id, data }: MutationUpdateCommentArgs,
     { pubsub }: GraphQLContext
   ) => {
-    const updatedComment = updateComment(id, data);
+    const dbComment = await updateComment(id, data);
+    const updatedComment = mapDBCommentToComment(dbComment);
+
     commentLogger.info({ comment: updatedComment }, "Comment updated");
 
-    pubsub.publish(`comment:${updatedComment.postId}`, {
+    pubsub.publish(`comment:${dbComment.postId}`, {
       type: "UPDATED",
       data: updatedComment,
     });
@@ -92,9 +85,9 @@ export const commentMutations: Pick<
           data: updatedComment,
         },
       },
-      `Comment published to comment:UPDATED:${updatedComment.postId}`
+      `Comment published to comment:UPDATED:${dbComment.postId}`
     );
 
-    return updatedComment as any;
+    return updatedComment;
   },
 };

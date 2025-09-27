@@ -1,6 +1,8 @@
 type Comment {
   id: ID!
   text: String!
+  orphaned: Boolean
+  archived: Boolean
   author: User
   post: Post
 }
@@ -13,6 +15,8 @@ input CreateCommentInput {
 
 input UpdateCommentInput {
   text: String
+  orphaned: Boolean
+  archived: Boolean
 }
 
 extend type Query {

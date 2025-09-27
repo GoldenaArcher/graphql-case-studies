@@ -28,6 +28,9 @@ export function createBatchLoader<K extends string | number, V>(
             }
         }
 
+        console.log('resultMap',resultMap);
+
+
         return keys.map((key) => resultMap[String(key)] || []);
     });
 }

@@ -6,14 +6,14 @@ import type { EventPayload, GraphQLContext } from "../../context/type";
 
 import { commentLogger } from "../../../utils/logger";
 
-import posts from "../post/data";
+import { findPostById } from "../../../prisma/repository/post.repo";
 
 export const commentSubscriptions: Pick<SubscriptionResolvers, "comment"> = {
   comment: {
-    subscribe: (_parent, args, { pubsub }: GraphQLContext) => {
-      const post = posts.find((p) => p.id === args.postId && p.published);
+    subscribe: async (_parent, args, { pubsub }: GraphQLContext) => {
+      const post = await findPostById(args.postId);
 
-      if (!post) {
+      if (!post || !post.published) {
         throw new Error("Post not found");
       }
 

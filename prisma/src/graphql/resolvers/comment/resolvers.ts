@@ -1,20 +1,16 @@
 import type { CommentResolvers } from "../../../generated/graphql";
+import type { GraphQLContext } from "../../context/type";
 
-import posts from "../post/data";
-import users from "../user/data";
+import { mapDBPostToPost } from "../post/post.mapper";
+import { mapDBUserToUser } from "../user/user.mappers";
 
 export const commentResolvers: CommentResolvers = {
-  author(parent: any) {
-    console.log("author", parent);
-    console.log("userId", parent.userId);
-
-    return parent.userId
-      ? (users.find((user) => user.id === parent.userId && user.active) as any)
-      : null;
+  async author(parent, _args, context: GraphQLContext) {
+    const user = await context.loaders.userByCommentLoader.load(parent.id);
+    return mapDBUserToUser(user[0]!.value);
   },
-  post(parent: any) {
-    return posts.find(
-      (post) => post.id === parent.postId && !post.archived
-    ) as any;
+  async post(parent, _args, context: GraphQLContext) {
+    const post = await context.loaders.postByCommentLoader.load(parent.id);
+    return mapDBPostToPost(post[0]!.value);
   },
 };
