@@ -8,13 +8,6 @@ type User {
   comments: [Comment]!
 }
 
-input CreateUserInput {
-  name: String!
-  email: String!
-  age: Int
-  password: String!
-}
-
 input UpdateUserInput {
   name: String
   email: String
@@ -38,7 +31,6 @@ extend type Query {
 }
 
 extend type Mutation {
-  createUser(data: CreateUserInput!): User!
   deleteUser(id: ID!): Boolean!
   updateUser(id: ID!, data: UpdateUserInput!): User!
   activateUser(id: ID!): User!

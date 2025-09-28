@@ -14,7 +14,7 @@ model User {
   email    String    @unique
   age      Int?
   active   Boolean   @default(false)
-  password String?   @default("")
+  password String    @default("")
   comments Comment[]
   posts    Post[]
 }

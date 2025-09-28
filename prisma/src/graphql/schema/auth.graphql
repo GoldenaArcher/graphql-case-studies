@@ -1,0 +1,15 @@
+input RegisterInput {
+    name: String!
+    email: String!
+    password: String!
+    age: Int
+}
+
+type AuthPayload {
+    user: User!
+    token: String!
+}
+
+extend type Mutation {
+    register(data: RegisterInput!): AuthPayload!
+}

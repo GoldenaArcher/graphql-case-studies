@@ -16,6 +16,12 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type AuthPayload = {
+  __typename?: 'AuthPayload';
+  token: Scalars['String']['output'];
+  user: User;
+};
+
 export type Comment = {
   __typename?: 'Comment';
   archived?: Maybe<Scalars['Boolean']['output']>;
@@ -44,13 +50,6 @@ export type CreatePostInput = {
   title: Scalars['String']['input'];
 };
 
-export type CreateUserInput = {
-  age?: InputMaybe<Scalars['Int']['input']>;
-  email: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-};
-
 export const EventType = {
   Created: 'CREATED',
   Deleted: 'DELETED',
@@ -63,11 +62,11 @@ export type Mutation = {
   activateUser: User;
   createComment: Comment;
   createPost: Post;
-  createUser: User;
   deleteComment: Scalars['Boolean']['output'];
   deletePost: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   publishPost: Post;
+  register: AuthPayload;
   updateComment: Comment;
   updatePost: Post;
   updateUser: User;
@@ -89,11 +88,6 @@ export type MutationCreatePostArgs = {
 };
 
 
-export type MutationCreateUserArgs = {
-  data: CreateUserInput;
-};
-
-
 export type MutationDeleteCommentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -111,6 +105,11 @@ export type MutationDeleteUserArgs = {
 
 export type MutationPublishPostArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  data: RegisterInput;
 };
 
 
@@ -192,6 +191,13 @@ export const QueryMode = {
 } as const;
 
 export type QueryMode = typeof QueryMode[keyof typeof QueryMode];
+export type RegisterInput = {
+  age?: InputMaybe<Scalars['Int']['input']>;
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type StringFilter = {
   contains?: InputMaybe<Scalars['String']['input']>;
   endsWith?: InputMaybe<Scalars['String']['input']>;
@@ -326,12 +332,12 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  AuthPayload: ResolverTypeWrapper<AuthPayload>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
   CommentEvent: ResolverTypeWrapper<CommentEvent>;
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
-  CreateUserInput: CreateUserInput;
   EventType: EventType;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
@@ -341,6 +347,7 @@ export type ResolversTypes = {
   PostWhereInput: PostWhereInput;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   QueryMode: QueryMode;
+  RegisterInput: RegisterInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   StringFilter: StringFilter;
   Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -353,12 +360,12 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  AuthPayload: AuthPayload;
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
   CommentEvent: CommentEvent;
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
-  CreateUserInput: CreateUserInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Mutation: Record<PropertyKey, never>;
@@ -366,6 +373,7 @@ export type ResolversParentTypes = {
   PostEvent: PostEvent;
   PostWhereInput: PostWhereInput;
   Query: Record<PropertyKey, never>;
+  RegisterInput: RegisterInput;
   String: Scalars['String']['output'];
   StringFilter: StringFilter;
   Subscription: Record<PropertyKey, never>;
@@ -374,6 +382,11 @@ export type ResolversParentTypes = {
   UpdateUserInput: UpdateUserInput;
   User: User;
   UserWhereInput: UserWhereInput;
+};
+
+export type AuthPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload']> = {
+  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
 };
 
 export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
@@ -394,11 +407,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   activateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationActivateUserArgs, 'id'>>;
   createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'data'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'data'>>;
-  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'data'>>;
   deleteComment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteCommentArgs, 'id'>>;
   deletePost?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePostArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   publishPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationPublishPostArgs, 'id'>>;
+  register?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'data'>>;
   updateComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationUpdateCommentArgs, 'data' | 'id'>>;
   updatePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationUpdatePostArgs, 'data' | 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'data' | 'id'>>;
@@ -443,6 +456,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type Resolvers<ContextType = any> = {
+  AuthPayload?: AuthPayloadResolvers<ContextType>;
   Comment?: CommentResolvers<ContextType>;
   CommentEvent?: CommentEventResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;

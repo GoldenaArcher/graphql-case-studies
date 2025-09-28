@@ -1,44 +1,32 @@
 import type { Prisma, User } from '../../../generated/prisma';
-import type { CreateUserInput, UpdateUserInput, UserWhereInput } from '../../generated/graphql';
-import { hashPassword } from '../../utils/auth';
+import type { RegisterInput, UpdateUserInput, UserWhereInput } from '../../generated/graphql';
 import prisma from '../index';
 
-const userRepository = prisma.user;
+const repo = prisma.user;
 
 export const checkUserExists = async (id: string) => {
-    return !!(await userRepository.findUnique({
+    return !!(await repo.findUnique({
         where: { id, },
         select: { id: true },
     }));
 }
 
 export const checkUserExistsAndIsActive = async (id: string) => {
-    return !!(await userRepository.findUnique({
+    return !!(await repo.findUnique({
         where: { id, active: true },
         select: { id: true },
     }));
 }
 
 export const isEmailTaken = async (email: string) => {
-    return !!(await userRepository.findUnique({
+    return !!(await repo.findUnique({
         where: { email, },
         select: { id: true },
     }));
 }
 
-export const createUser = async (data: CreateUserInput): Promise<User> => {
-    if (await isEmailTaken(data.email)) {
-        throw new Error('Email already taken');
-    }
-
-    const payload: Prisma.UserCreateInput = {
-        ...data,
-        password: await hashPassword(data.password),
-    };
-
-    return await userRepository.create({
-        data: payload,
-    });
+const createUser = async (data: RegisterInput): Promise<User> => {
+    return await repo.create({ data });
 }
 
 export const updateUser = async (id: string, data: UpdateUserInput): Promise<User> => {
@@ -68,7 +56,7 @@ export const updateUser = async (id: string, data: UpdateUserInput): Promise<Use
         payload.active = data.active;
     }
 
-    return await userRepository.update({
+    return await repo.update({
         where: { id },
         data: payload,
     });
@@ -97,3 +85,23 @@ export const findUsers = async (where?: UserWhereInput): Promise<User[]> => {
         where: cleaned,
     });
 };
+
+export const findUserByEmail = async (email: string): Promise<User | null> => {
+    return await prisma.user.findUnique({
+        where: { email },
+    });
+}
+
+const userRepository = {
+    checkUserExists,
+    checkUserExistsAndIsActive,
+    isEmailTaken,
+    createUser,
+    updateUser,
+    activateUser,
+    deactivateUser,
+    findUsers,
+    findUserByEmail,
+}
+
+export default userRepository;
