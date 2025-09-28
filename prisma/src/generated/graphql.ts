@@ -57,6 +57,11 @@ export const EventType = {
 } as const;
 
 export type EventType = typeof EventType[keyof typeof EventType];
+export type LoginInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   activateUser: User;
@@ -65,6 +70,7 @@ export type Mutation = {
   deleteComment: Scalars['Boolean']['output'];
   deletePost: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  login: AuthPayload;
   publishPost: Post;
   register: AuthPayload;
   updateComment: Comment;
@@ -100,6 +106,11 @@ export type MutationDeletePostArgs = {
 
 export type MutationDeleteUserArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationLoginArgs = {
+  data: LoginInput;
 };
 
 
@@ -250,11 +261,7 @@ export type User = {
 };
 
 export type UserWhereInput = {
-  AND?: InputMaybe<Array<UserWhereInput>>;
-  NOT?: InputMaybe<Array<UserWhereInput>>;
-  OR?: InputMaybe<Array<UserWhereInput>>;
   active?: InputMaybe<Scalars['Boolean']['input']>;
-  age?: InputMaybe<Scalars['Int']['input']>;
   email?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
 };
@@ -341,6 +348,7 @@ export type ResolversTypes = {
   EventType: EventType;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Post: ResolverTypeWrapper<Post>;
   PostEvent: ResolverTypeWrapper<PostEvent>;
@@ -368,6 +376,7 @@ export type ResolversParentTypes = {
   CreatePostInput: CreatePostInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
+  LoginInput: LoginInput;
   Mutation: Record<PropertyKey, never>;
   Post: Post;
   PostEvent: PostEvent;
@@ -410,6 +419,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteComment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteCommentArgs, 'id'>>;
   deletePost?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePostArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
+  login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'data'>>;
   publishPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationPublishPostArgs, 'id'>>;
   register?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'data'>>;
   updateComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationUpdateCommentArgs, 'data' | 'id'>>;

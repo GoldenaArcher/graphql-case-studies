@@ -70,25 +70,19 @@ export const deactivateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: false });
 }
 
-export const findUsers = async (where?: UserWhereInput): Promise<User[]> => {
-    const cleaned = {
-        active: true,
-        AND: where?.AND ?? undefined,
-        OR: where?.OR ?? undefined,
-        NOT: where?.NOT ?? undefined,
-        age: where?.age ?? undefined,
-        email: where?.email ?? undefined,
-        name: where?.name ?? undefined,
-    } as Prisma.UserWhereInput;
-
-    return await prisma.user.findMany({
-        where: cleaned,
-    });
+export const findUsers = async (where: Prisma.UserWhereInput): Promise<User[]> => {
+    return await prisma.user.findMany({ where });
 };
 
-export const findUserByEmail = async (email: string): Promise<User | null> => {
+const findUserByEmail = async (email: string): Promise<User | null> => {
     return await prisma.user.findUnique({
         where: { email },
+    });
+}
+
+const findUserById = async (id: string): Promise<User | null> => {
+    return await prisma.user.findUnique({
+        where: { id },
     });
 }
 
@@ -102,6 +96,7 @@ const userRepository = {
     deactivateUser,
     findUsers,
     findUserByEmail,
+    findUserById,
 }
 
 export default userRepository;

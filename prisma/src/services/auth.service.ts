@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken';
 import { comparePassword, hashPassword } from '../utils/auth';
 import userRepository from '../prisma/repository/user.repo';
 import { mapDBUserToUser } from '../graphql/resolvers/user/user.mappers';
-import type { RegisterInput } from '../generated/graphql';
+import type { LoginInput, RegisterInput } from '../generated/graphql';
+import { logger } from '../utils/logger';
 
 const register = async (data: RegisterInput) => {
     const user = await userRepository.findUserByEmail(data.email);
@@ -22,15 +23,15 @@ const register = async (data: RegisterInput) => {
     };
 };
 
-const login = async (email: string, password: string) => {
-    const user = await userRepository.findUserByEmail(email);
+const login = async (data: LoginInput) => {
+    const user = await userRepository.findUserByEmail(data.email);
     if (!user) throw new Error('Invalid email or password');
 
-    const isValid = await comparePassword(password, user.password);
+    const isValid = await comparePassword(data.password, user.password);
     if (!isValid) throw new Error('Invalid email or password');
 
     return {
-        user,
+        user: mapDBUserToUser(user),
         token: generateToken(user.id)
     };
 };
@@ -41,10 +42,33 @@ const generateToken = (userId: string) => {
     });
 };
 
+const verifyToken = (token: string, requestId: string) => {
+    try {
+        const payload = jwt.verify(token, process.env.JWT_SECRET!) as jwt.JwtPayload;
+        return payload.userId;
+    } catch (err) {
+        let errMsg = `${requestId} \n`
+        if (err instanceof jwt.JsonWebTokenError) {
+            errMsg += err.message;
+            logger.error({ requestId }, errMsg);
+            throw new Error("Invalid token");
+        } else if (err instanceof Error) {
+            errMsg += err.message;
+            logger.error({ requestId }, errMsg);
+            throw err;
+        } else {
+            errMsg += String(err);
+            logger.error({ requestId }, errMsg);
+            throw new Error("Unknown error");
+        }
+    }
+}
+
 const authService = {
     register,
     login,
     generateToken,
+    verifyToken,
 }
 
 export default authService;

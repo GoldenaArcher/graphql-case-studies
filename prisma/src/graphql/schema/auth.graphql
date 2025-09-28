@@ -5,6 +5,11 @@ input RegisterInput {
     age: Int
 }
 
+input LoginInput {
+    email: String!
+    password: String!
+}
+
 type AuthPayload {
     user: User!
     token: String!
@@ -12,4 +17,5 @@ type AuthPayload {
 
 extend type Mutation {
     register(data: RegisterInput!): AuthPayload!
+    login(data: LoginInput!): AuthPayload!
 }

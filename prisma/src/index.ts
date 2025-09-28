@@ -2,34 +2,19 @@ import http from "http";
 import { createYoga } from "graphql-yoga";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/use/ws";
-import { randomUUID } from "crypto";
 
 import { schema } from "./graphql/schema";
 // import { startMockCountPublisher } from "./graphql/pubsub/startMockCountPublisher";
 
 import type { GraphQLContext } from "./graphql/context/type";
-import { pubsub } from "./graphql/context/pubsub";
-import { createLoaders } from "./graphql/loaders";
+import context from "./graphql/context";
 
 import { logger } from "./utils/logger";
 
 const yogaApp = createYoga<GraphQLContext>({
   schema,
   graphqlEndpoint: "/graphql",
-  context: ({ request }): GraphQLContext => {
-    const requestId = randomUUID();
-
-    if (request) {
-      logger.info({ requestId, url: request.url }, "Incoming HTTP request");
-    } else {
-      logger.info(
-        { requestId },
-        "Incoming WS subscription or non-HTTP request"
-      );
-    }
-
-    return { pubsub, requestId, loaders: createLoaders(), };
-  },
+  context,
   graphiql: {
     // Use WebSockets in GraphiQL
     subscriptionsProtocol: "WS",
