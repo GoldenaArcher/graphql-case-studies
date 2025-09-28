@@ -24,9 +24,6 @@ input PostWhereInput {
   body: StringFilter
   published: Boolean
   archive: Boolean
-  AND: [PostWhereInput!]
-  OR: [PostWhereInput!]
-  NOT: [PostWhereInput!]
 }
 
 extend type Query {

@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import type { Prisma } from '../../generated/prisma';
-import type { LoginInput, RegisterInput, UpdateUserInput, User } from '../generated/graphql';
+import type { LoginInput, RegisterInput, User } from '../generated/graphql';
 
 import { comparePassword, hashPassword } from '../utils/auth';
 import userRepository from '../prisma/repository/user.repo';
@@ -123,28 +122,7 @@ const deactivateUser = async (id: string, user: User | null | undefined) => {
     return await userRepository.deactivateUser(id);
 }
 
-const updateUser = async (id: string, data: UpdateUserInput, user: User | null | undefined) => {
-    const dbUser = await userRepository.findUserById(id);
-    if (!dbUser) {
-        throw new Error('User not found');
-    }
 
-    if (!checkIsSameUser(user, id)) {
-        throw new Error('User not authorized to update this user');
-    }
-
-    const payload: Prisma.UserUpdateInput = {};
-
-    if (data.name != null) {
-        payload.name = data.name;
-    }
-
-    if (data.email != null) {
-        payload.email = data.email;
-    }
-
-    return await userRepository.updateUser(id, payload);
-}
 
 const authService = {
     register,
@@ -155,7 +133,6 @@ const authService = {
     checkIsSameUser,
     activateUser,
     deactivateUser,
-    updateUser,
 }
 
 export default authService;

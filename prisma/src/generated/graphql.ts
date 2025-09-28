@@ -157,9 +157,6 @@ export type PostEvent = {
 };
 
 export type PostWhereInput = {
-  AND?: InputMaybe<Array<PostWhereInput>>;
-  NOT?: InputMaybe<Array<PostWhereInput>>;
-  OR?: InputMaybe<Array<PostWhereInput>>;
   archive?: InputMaybe<Scalars['Boolean']['input']>;
   body?: InputMaybe<StringFilter>;
   published?: InputMaybe<Scalars['Boolean']['input']>;

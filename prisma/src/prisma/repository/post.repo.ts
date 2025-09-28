@@ -1,8 +1,6 @@
 import type { Post, Prisma } from '../../../generated/prisma';
-import type { CreatePostInput, PostWhereInput, UpdatePostInput } from '../../generated/graphql';
 import prisma from '../index';
 import { orphanComment } from './comment.repo';
-import { checkUserExistsAndIsActive } from './user.repo';
 
 const repo = prisma.post;
 
@@ -20,35 +18,14 @@ export const checkPostIsPublished = async (postId: string) => {
     }));
 }
 
-export const findPostById = async (postId: string): Promise<Post> => {
-    const post = await prisma.post.findUnique({
+const findPostById = async (postId: string): Promise<Post | null> => {
+    return await prisma.post.findUnique({
         where: { id: postId },
     });
-
-    if (!post) {
-        throw new Error('Post not found');
-    }
-
-    return post;
 }
 
-export const findPosts = async (where?: PostWhereInput): Promise<Post[]> => {
-    const cleaned = {
-        published: true,
-        ...(where && {
-            title: where.title?.contains ?? undefined,
-            body: where.body?.contains ?? undefined,
-            published: where.published ?? undefined,
-            archive: where.archive ?? undefined,
-            AND: where.AND ?? undefined,
-            OR: where.OR ?? undefined,
-            NOT: where.NOT ?? undefined,
-        }),
-    } as Prisma.PostWhereInput;
-
-    return await prisma.post.findMany({
-        where: cleaned,
-    });
+const findPosts = async (where: Prisma.PostWhereInput): Promise<Post[]> => {
+    return await prisma.post.findMany({ where });
 }
 
 const createPost = async (data: Prisma.PostCreateInput): Promise<Post> => {

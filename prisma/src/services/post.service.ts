@@ -1,5 +1,5 @@
 import type { Prisma } from "../../generated/prisma";
-import type { CreatePostInput, UpdatePostInput, User } from "../generated/graphql";
+import type { CreatePostInput, PostWhereInput, UpdatePostInput, User } from "../generated/graphql";
 import { mapDBPostToPost } from "../graphql/resolvers/post/post.mapper";
 
 import postRepository from "../prisma/repository/post.repo";
@@ -56,9 +56,33 @@ const updatePost = async (id: string, data: UpdatePostInput, user: User | null |
     return mapDBPostToPost(await postRepository.updatePost(id, payload));
 }
 
+const findPostById = async (id: string) => {
+    const post = await postRepository.findPostById(id);
+
+    if (!post) {
+        throw new Error('Post not found');
+    }
+
+    return mapDBPostToPost(post);
+}
+
+const findPosts = async (where?: PostWhereInput) => {
+    const cleaned: Prisma.PostWhereInput = {
+        published: true,
+        archived: false,
+    }
+
+    if (where?.title) cleaned.title = { ...where.title } as Prisma.StringFilter
+    if (where?.body) cleaned.body = { ...where.body } as Prisma.StringFilter
+
+    return (await postRepository.findPosts(cleaned)).map(mapDBPostToPost);
+}
+
 const postService = {
     createPost,
     updatePost,
+    findPostById,
+    findPosts,
 }
 
 export default postService;
