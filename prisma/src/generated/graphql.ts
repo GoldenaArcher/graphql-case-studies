@@ -45,7 +45,6 @@ export type CreateCommentInput = {
 };
 
 export type CreatePostInput = {
-  author: Scalars['ID']['input'];
   body: Scalars['String']['input'];
   title: Scalars['String']['input'];
 };

@@ -4,6 +4,8 @@ import prisma from '../index';
 import { orphanComment } from './comment.repo';
 import { checkUserExistsAndIsActive } from './user.repo';
 
+const repo = prisma.post;
+
 export const checkPostExists = async (postId: string) => {
     return !!(await prisma.post.findUnique({
         where: { id: postId },
@@ -49,48 +51,18 @@ export const findPosts = async (where?: PostWhereInput): Promise<Post[]> => {
     });
 }
 
-export const createPost = async (data: CreatePostInput): Promise<Post> => {
-    if (!(await checkUserExistsAndIsActive(data.author))) {
-        throw new Error('User not found or inactive');
-    }
-
-    const payload: Prisma.PostCreateInput = {
-        title: data.title,
-        body: data.body,
-        published: false,
-        archived: false,
-        user: {
-            connect: { id: data.author }
-        }
-    };
-
-    return await prisma.post.create({
-        data: payload
-    });
+const createPost = async (data: Prisma.PostCreateInput): Promise<Post> => {
+    return await repo.create({ data });
 }
 
-export const updatePost = async (postId: string, data: UpdatePostInput): Promise<Post> => {
+export const updatePost = async (postId: string, data: Prisma.PostUpdateInput): Promise<Post> => {
     if (!(await checkPostExists(postId))) {
         throw new Error('Post not found');
     }
 
-    const payload: Prisma.PostUpdateInput = {};
-
-    if (data.title != null) {
-        payload.title = data.title;
-    }
-
-    if (data.body != null) {
-        payload.body = data.body;
-    }
-
-    if (data.published != null) {
-        payload.published = data.published;
-    }
-
     return await prisma.post.update({
         where: { id: postId },
-        data: payload,
+        data,
     });
 }
 
@@ -101,7 +73,7 @@ export const archivePost = async (postId: string): Promise<Post> => {
         throw new Error('Post does not exist.');
     }
 
-    const archivedPost = await updatePost(postId, { archive: true });
+    const archivedPost = await updatePost(postId, { archived: true });
     await orphanComment(postId);
 
     return archivedPost;
@@ -110,3 +82,16 @@ export const archivePost = async (postId: string): Promise<Post> => {
 export const publishPost = async (postId: string): Promise<Post> => {
     return updatePost(postId, { published: true });
 }
+
+const postRepository = {
+    checkPostExists,
+    checkPostIsPublished,
+    findPostById,
+    findPosts,
+    createPost,
+    updatePost,
+    archivePost,
+    publishPost,
+}
+
+export default postRepository;

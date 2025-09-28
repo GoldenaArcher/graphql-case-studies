@@ -10,7 +10,6 @@ type Post {
 input CreatePostInput {
   title: String!
   body: String!
-  author: ID!
 }
 
 input UpdatePostInput {

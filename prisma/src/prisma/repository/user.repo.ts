@@ -29,12 +29,12 @@ const createUser = async (data: RegisterInput): Promise<User> => {
     return await repo.create({ data });
 }
 
-export const updateUser = async (id: string, data: UpdateUserInput): Promise<User> => {
+const updateUser = async (id: string, data: Prisma.UserUpdateInput): Promise<User> => {
     if (!(await checkUserExists(id))) {
         throw new Error('User not found');
     }
 
-    if (data.email && await isEmailTaken(data.email)) {
+    if (data.email && await isEmailTaken(data.email as string)) {
         throw new Error('Email already taken');
     }
 
@@ -62,11 +62,11 @@ export const updateUser = async (id: string, data: UpdateUserInput): Promise<Use
     });
 }
 
-export const activateUser = async (id: string): Promise<User> => {
+const activateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: true });
 }
 
-export const deactivateUser = async (id: string): Promise<User> => {
+const deactivateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: false });
 }
 

@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken';
 
+import type { Prisma } from '../../generated/prisma';
+import type { LoginInput, RegisterInput, UpdateUserInput, User } from '../generated/graphql';
+
 import { comparePassword, hashPassword } from '../utils/auth';
 import userRepository from '../prisma/repository/user.repo';
 import { mapDBUserToUser } from '../graphql/resolvers/user/user.mappers';
-import type { LoginInput, RegisterInput } from '../generated/graphql';
+
 import { logger } from '../utils/logger';
 
 const register = async (data: RegisterInput) => {
@@ -64,11 +67,95 @@ const verifyToken = (token: string, requestId: string) => {
     }
 }
 
+const checkUserIsAuthenticatedAndActive = async (user: User | string | null | undefined) => {
+    if (!user) {
+        return false;
+    }
+
+    if (typeof user === 'string' && !(await userRepository.checkUserExistsAndIsActive(user))) {
+        return false;
+    }
+
+    return !!(user as User).id;
+}
+
+const checkIsSameUser = (user: User | null | undefined | string, id: string) => {
+    if (typeof user === 'string') {
+        return user === id;
+    }
+
+    return user && user.id === id;
+}
+
+const activateUser = async (id: string, user: User | null | undefined) => {
+    const dbUser = await userRepository.findUserById(id);
+
+    if (!dbUser) {
+        throw new Error('User not found');
+    }
+
+    if (dbUser.active) {
+        throw new Error('User already active');
+    }
+
+    if (!checkIsSameUser(user, id)) {
+        throw new Error('User not authorized to activate this user');
+    }
+
+    return await userRepository.activateUser(id);
+}
+
+const deactivateUser = async (id: string, user: User | null | undefined) => {
+    const dbUser = await userRepository.findUserById(id);
+
+    if (!dbUser) {
+        throw new Error('User not found');
+    }
+
+    if (!dbUser.active) {
+        throw new Error('User already inactive');
+    }
+
+    if (!checkIsSameUser(user, id)) {
+        throw new Error('User not authorized to deactivate this user');
+    }
+
+    return await userRepository.deactivateUser(id);
+}
+
+const updateUser = async (id: string, data: UpdateUserInput, user: User | null | undefined) => {
+    const dbUser = await userRepository.findUserById(id);
+    if (!dbUser) {
+        throw new Error('User not found');
+    }
+
+    if (!checkIsSameUser(user, id)) {
+        throw new Error('User not authorized to update this user');
+    }
+
+    const payload: Prisma.UserUpdateInput = {};
+
+    if (data.name != null) {
+        payload.name = data.name;
+    }
+
+    if (data.email != null) {
+        payload.email = data.email;
+    }
+
+    return await userRepository.updateUser(id, payload);
+}
+
 const authService = {
     register,
     login,
     generateToken,
     verifyToken,
+    checkUserIsAuthenticatedAndActive,
+    checkIsSameUser,
+    activateUser,
+    deactivateUser,
+    updateUser,
 }
 
 export default authService;

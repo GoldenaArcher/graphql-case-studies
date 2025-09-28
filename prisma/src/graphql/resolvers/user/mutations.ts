@@ -4,23 +4,24 @@ import type {
   MutationResolvers,
   MutationUpdateUserArgs,
 } from "../../../generated/graphql";
-import { updateUser, deactivateUser, activateUser } from "../../../prisma/repository/user.repo";
+import authService from "../../../services/auth.service";
+import type { GraphQLContext } from "../../context/type";
 import { mapDBUserToUser } from "./user.mappers";
 
 export const userMutations: Pick<
   MutationResolvers,
   "deleteUser" | "updateUser" | "activateUser"
 > = {
-  activateUser: async (_parent, { id }: MutationActivateUserArgs) => {
-    const dbUser = await activateUser(id);
+  activateUser: async (_parent, { id }: MutationActivateUserArgs, { user }: GraphQLContext) => {
+    const dbUser = await authService.activateUser(id, user);
     return mapDBUserToUser(dbUser);
   },
-  deleteUser: (_parent, { id }: MutationDeleteUserArgs) => {
-    deactivateUser(id);
+  deleteUser: async (_parent, { id }: MutationDeleteUserArgs, { user }: GraphQLContext) => {
+    await authService.deactivateUser(id, user);
     return true;
   },
-  updateUser: async (_parent, { id, data }: MutationUpdateUserArgs) => {
-    const dbUser = await updateUser(id, data);
+  updateUser: async (_parent, { id, data }: MutationUpdateUserArgs, { user }: GraphQLContext) => {
+    const dbUser = await authService.updateUser(id, data, user);
     return mapDBUserToUser(dbUser);
   },
 };

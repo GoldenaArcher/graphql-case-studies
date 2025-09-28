@@ -9,8 +9,9 @@ import type { GraphQLContext } from "../../context/type";
 
 import { postLogger } from "../../../utils/logger";
 
-import { createPost, archivePost, updatePost, publishPost } from "../../../prisma/repository/post.repo";
+import { archivePost, updatePost, publishPost } from "../../../prisma/repository/post.repo";
 import { mapDBPostToPost } from "./post.mapper";
+import postService from "../../../services/post.service";
 
 export const postMutations: Pick<
   MutationResolvers,
@@ -19,10 +20,9 @@ export const postMutations: Pick<
   createPost: async (
     _parent,
     { data }: MutationCreatePostArgs,
-    { pubsub }: GraphQLContext
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbPost = await createPost(data);
-    const newPost = mapDBPostToPost(dbPost);
+    const newPost = await postService.createPost(data, user);
 
     postLogger.info({ post: newPost }, "Post created");
 
@@ -73,10 +73,9 @@ export const postMutations: Pick<
   updatePost: async (
     _parent,
     { id, data }: MutationUpdatePostArgs,
-    { pubsub }: GraphQLContext
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbPost = await updatePost(id, data);
-    const updatedPost = mapDBPostToPost(dbPost);
+    const updatedPost = await postService.updatePost(id, data, user);
 
     postLogger.info({ post: updatedPost }, "Post updated");
 
