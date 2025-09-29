@@ -4,6 +4,8 @@ import type { CreateCommentInput, UpdateCommentInput } from '../../generated/gra
 import { checkPostExists, checkPostIsPublished } from './post.repo';
 import { checkUserExistsAndIsActive } from './user.repo';
 
+const repo = prisma.comment;
+
 export const getCommentById = async (id: string): Promise<Comment | null> => {
     return await prisma.comment.findUnique({
         where: { id },
@@ -82,6 +84,21 @@ export const archiveComment = async (id: string): Promise<Comment> => {
     return await updateComment(id, { archived: true });
 }
 
-export const orphanComment = async (id: string): Promise<Comment> => {
-    return await updateComment(id, { orphaned: true });
+export const orphanComment = async (commentId: string): Promise<Comment> => {
+    return await updateComment(commentId, { orphaned: true });
 }
+
+const orphanCommentsByPostId = async (postId: string): Promise<number> => {
+    const result = await prisma.comment.updateMany({
+        where: { postId },
+        data: { orphaned: true }
+    });
+
+    return result.count;
+}
+
+const commentRepository = {
+    orphanCommentsByPostId
+}
+
+export default commentRepository;

@@ -9,8 +9,6 @@ import type { GraphQLContext } from "../../context/type";
 
 import { postLogger } from "../../../utils/logger";
 
-import { archivePost, updatePost, publishPost } from "../../../prisma/repository/post.repo";
-import { mapDBPostToPost } from "./post.mapper";
 import postService from "../../../services/post.service";
 
 export const postMutations: Pick<
@@ -46,12 +44,11 @@ export const postMutations: Pick<
   deletePost: async (
     _parent,
     { id }: MutationDeletePostArgs,
-    { pubsub }: GraphQLContext
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbPost = await archivePost(id);
-    const archivedPost = mapDBPostToPost(dbPost);
+    const archivedPost = await postService.archivePost(id, user);
 
-    postLogger.info({ post: dbPost }, "Post archived");
+    postLogger.info({ post: archivedPost }, "Post archived");
 
     pubsub.publish(`post`, {
       type: `DELETED`,
@@ -99,11 +96,9 @@ export const postMutations: Pick<
   publishPost: async (
     _parent,
     { id }: MutationPublishPostArgs,
-    { pubsub }: GraphQLContext
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbPost = await publishPost(id);
-    const publishedPost = mapDBPostToPost(dbPost);
-
+    const publishedPost = await postService.publishPost(id, user);
     postLogger.info({ post: publishedPost }, "Post published");
 
     pubsub.publish(`post`, {

@@ -1,9 +1,11 @@
 import type { Prisma } from "../../generated/prisma";
 import type { CreatePostInput, PostWhereInput, UpdatePostInput, User } from "../generated/graphql";
 import { mapDBPostToPost } from "../graphql/resolvers/post/post.mapper";
+import commentRepository from "../prisma/repository/comment.repo";
 
 import postRepository from "../prisma/repository/post.repo";
 import userRepository from "../prisma/repository/user.repo";
+import { postLogger } from "../utils/logger";
 import authService from "./auth.service";
 
 const createPost = async (data: CreatePostInput, user: User | null | undefined) => {
@@ -29,7 +31,9 @@ const createPost = async (data: CreatePostInput, user: User | null | undefined) 
 }
 
 const updatePost = async (id: string, data: UpdatePostInput, user: User | null | undefined) => {
-    if (!(await authService.checkUserIsAuthenticatedAndActive(user))) {
+    const retrievedUser = await authService.getUser(user);
+
+    if (!(await authService.checkUserIsAuthenticatedAndActive(retrievedUser))) {
         throw new Error('User not authenticated or inactive');
     }
 
@@ -39,7 +43,7 @@ const updatePost = async (id: string, data: UpdatePostInput, user: User | null |
         throw new Error('Post not found');
     }
 
-    if (post.author !== user!.id) {
+    if (!authService.checkIsSameUser(retrievedUser, post?.author!)) {
         throw new Error('User not authorized to update this post');
     }
 
@@ -54,6 +58,53 @@ const updatePost = async (id: string, data: UpdatePostInput, user: User | null |
     }
 
     return mapDBPostToPost(await postRepository.updatePost(id, payload));
+}
+
+const archivePost = async (id: string, user: User | null | undefined) => {
+    const retrievedUser = await authService.getUser(user);
+
+    if (!(await authService.checkUserIsAuthenticatedAndActive(retrievedUser))) {
+        throw new Error('User not authenticated or inactive');
+    }
+
+    const post = await postRepository.findPostById(id);
+
+    if (!authService.checkIsSameUser(retrievedUser, post?.author!)) {
+        throw new Error('User not authorized to archive this post');
+    }
+
+    if (!post || post.archived || !post.published) {
+        throw new Error('Post does not exist.');
+    }
+
+    const archivedPost = await postRepository.archivePost(id);
+    const orphanedCommentCount = await commentRepository.orphanCommentsByPostId(id);
+
+    if (orphanedCommentCount !== 0) {
+        postLogger.warn({ archivePost: id }, `Orphaned ${orphanedCommentCount} comments for post ${id}`);
+    }
+
+    return mapDBPostToPost(archivedPost);
+}
+
+const publishPost = async (id: string, user: User | null | undefined) => {
+    const retrievedUser = await authService.getUser(user);
+
+    if (!(await authService.checkUserIsAuthenticatedAndActive(retrievedUser))) {
+        throw new Error('User not authenticated or inactive');
+    }
+
+    const post = await postRepository.findPostById(id);
+
+    if (!authService.checkIsSameUser(retrievedUser, post?.author!)) {
+        throw new Error('User not authorized to publish this post');
+    }
+
+    if (!post || post.archived || post.published) {
+        throw new Error('Post does not exist.');
+    }
+
+    return mapDBPostToPost(await postRepository.publishPost(id));
 }
 
 const findPostById = async (id: string) => {
@@ -81,6 +132,8 @@ const findPosts = async (where?: PostWhereInput) => {
 const postService = {
     createPost,
     updatePost,
+    archivePost,
+    publishPost,
     findPostById,
     findPosts,
 }

@@ -66,6 +66,23 @@ const verifyToken = (token: string, requestId: string) => {
     }
 }
 
+const getUser = async (user: User | string | null | undefined): Promise<User> => {
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    if (typeof user === 'string') {
+        const dbUser = await userRepository.findUserById(user);
+        if (!dbUser) {
+            throw new Error('User not found');
+        }
+
+        return mapDBUserToUser(dbUser);
+    }
+
+    return user;
+}
+
 const checkUserIsAuthenticatedAndActive = async (user: User | string | null | undefined) => {
     if (!user) {
         return false;
@@ -129,6 +146,7 @@ const authService = {
     login,
     generateToken,
     verifyToken,
+    getUser,
     checkUserIsAuthenticatedAndActive,
     checkIsSameUser,
     activateUser,

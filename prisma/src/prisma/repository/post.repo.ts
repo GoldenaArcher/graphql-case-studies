@@ -32,7 +32,7 @@ const createPost = async (data: Prisma.PostCreateInput): Promise<Post> => {
     return await repo.create({ data });
 }
 
-export const updatePost = async (postId: string, data: Prisma.PostUpdateInput): Promise<Post> => {
+const updatePost = async (postId: string, data: Prisma.PostUpdateInput): Promise<Post> => {
     if (!(await checkPostExists(postId))) {
         throw new Error('Post not found');
     }
@@ -43,7 +43,7 @@ export const updatePost = async (postId: string, data: Prisma.PostUpdateInput): 
     });
 }
 
-export const archivePost = async (postId: string): Promise<Post> => {
+const archivePost = async (postId: string): Promise<Post> => {
     const post = await findPostById(postId);
 
     if (!post || post.archived || !post.published) {
@@ -56,7 +56,7 @@ export const archivePost = async (postId: string): Promise<Post> => {
     return archivedPost;
 }
 
-export const publishPost = async (postId: string): Promise<Post> => {
+const publishPost = async (postId: string): Promise<Post> => {
     return updatePost(postId, { published: true });
 }
 
