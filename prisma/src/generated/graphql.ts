@@ -39,7 +39,6 @@ export type CommentEvent = {
 };
 
 export type CreateCommentInput = {
-  author: Scalars['ID']['input'];
   post: Scalars['ID']['input'];
   text: Scalars['String']['input'];
 };

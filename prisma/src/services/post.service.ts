@@ -30,6 +30,9 @@ const createPost = async (data: CreatePostInput, user: User | null | undefined) 
     return mapDBPostToPost(await postRepository.createPost(payload));
 }
 
+// alternative option is to create another method called findPostByIdAndUserId
+// then there is no need to make so many queries for validation/guards
+// this approach is more useful when finer grained control is needed
 const updatePost = async (id: string, data: UpdatePostInput, user: User | null | undefined) => {
     const retrievedUser = await authService.getUser(user);
 
@@ -117,7 +120,7 @@ const findPostById = async (id: string) => {
     return mapDBPostToPost(post);
 }
 
-const findPosts = async (where?: PostWhereInput) => {
+const findAvailablePosts = async (where?: PostWhereInput) => {
     const cleaned: Prisma.PostWhereInput = {
         published: true,
         archived: false,
@@ -129,13 +132,18 @@ const findPosts = async (where?: PostWhereInput) => {
     return (await postRepository.findPosts(cleaned)).map(mapDBPostToPost);
 }
 
+const checkPostExists = async (id: string) => {
+    return !!(await postRepository.findPostById(id));
+}
+
 const postService = {
     createPost,
     updatePost,
     archivePost,
     publishPost,
     findPostById,
-    findPosts,
+    findAvailablePosts,
+    checkPostExists,
 }
 
 export default postService;

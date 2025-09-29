@@ -1,31 +1,34 @@
 import type { Prisma, User } from '../../../generated/prisma';
-import type { RegisterInput, UpdateUserInput, UserWhereInput } from '../../generated/graphql';
 import prisma from '../index';
 
 const repo = prisma.user;
 
-export const checkUserExists = async (id: string) => {
+const checkUserExists = async (id: string) => {
     return !!(await repo.findUnique({
         where: { id, },
         select: { id: true },
     }));
 }
 
-export const checkUserExistsAndIsActive = async (id: string) => {
+const checkUserExistsAndIsActive = async (id: string | null | undefined) => {
+    if (!id) {
+        return false;
+    }
+    
     return !!(await repo.findUnique({
         where: { id, active: true },
         select: { id: true },
     }));
 }
 
-export const isEmailTaken = async (email: string) => {
+const isEmailTaken = async (email: string) => {
     return !!(await repo.findUnique({
         where: { email, },
         select: { id: true },
     }));
 }
 
-const createUser = async (data: RegisterInput): Promise<User> => {
+const createUser = async (data: Prisma.UserCreateInput): Promise<User> => {
     return await repo.create({ data });
 }
 
@@ -70,7 +73,7 @@ const deactivateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: false });
 }
 
-export const findUsers = async (where: Prisma.UserWhereInput): Promise<User[]> => {
+const findUsers = async (where: Prisma.UserWhereInput): Promise<User[]> => {
     return await prisma.user.findMany({ where });
 };
 

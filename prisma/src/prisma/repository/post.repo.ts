@@ -1,17 +1,16 @@
 import type { Post, Prisma } from '../../../generated/prisma';
 import prisma from '../index';
-import { orphanComment } from './comment.repo';
 
 const repo = prisma.post;
 
-export const checkPostExists = async (postId: string) => {
+const checkPostExists = async (postId: string) => {
     return !!(await prisma.post.findUnique({
         where: { id: postId },
         select: { id: true },
     }));
 }
 
-export const checkPostIsPublished = async (postId: string) => {
+const checkPostIsPublished = async (postId: string) => {
     return !!(await prisma.post.findUnique({
         where: { id: postId },
         select: { published: true },
@@ -51,7 +50,6 @@ const archivePost = async (postId: string): Promise<Post> => {
     }
 
     const archivedPost = await updatePost(postId, { archived: true });
-    await orphanComment(postId);
 
     return archivedPost;
 }

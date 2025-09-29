@@ -8,8 +8,7 @@ import type {
 import type { GraphQLContext } from "../../context/type";
 import { commentLogger } from "../../../utils/logger";
 
-import { createComment, updateComment, archiveComment } from "../../../prisma/repository/comment.repo";
-import { mapDBCommentToComment } from "./comment.mapper";
+import commentService from "../../../services/comment.service";
 
 export const commentMutations: Pick<
   MutationResolvers,
@@ -17,25 +16,20 @@ export const commentMutations: Pick<
 > = {
   createComment: async (
     _parent,
-    { data: { text, author, post } }: MutationCreateCommentArgs,
-    { pubsub }: GraphQLContext
+    { data }: MutationCreateCommentArgs,
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbComment = await createComment({
-      text,
-      author,
-      post,
-    });
-    const newComment = mapDBCommentToComment(dbComment);
+    const newComment = await commentService.createComment(data, user);
 
     commentLogger.info({ comment: newComment }, "Comment created");
 
-    pubsub.publish(`comment:${post}`, {
+    pubsub.publish(`comment:${newComment.post!.id}`, {
       type: "CREATED",
       data: newComment
     });
     commentLogger.info(
       { comment: newComment },
-      `Comment published to comment:CREATED:${post}`
+      `Comment published to comment:CREATED:${newComment.post!.id}`
     );
 
     return newComment;
@@ -43,13 +37,12 @@ export const commentMutations: Pick<
   deleteComment: async (
     _parent,
     { id }: MutationDeleteCommentArgs,
-    { pubsub }: GraphQLContext
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbComment = await archiveComment(id);
-    const deletedComment = mapDBCommentToComment(dbComment);
+    const deletedComment = await commentService.archiveComment(id, user);
     commentLogger.info({ comment: deletedComment }, "Comment deleted");
 
-    pubsub.publish(`comment:${dbComment.postId}`, {
+    pubsub.publish(`comment:${deletedComment.post}`, {
       type: "DELETED",
       data: deletedComment,
     });
@@ -60,21 +53,20 @@ export const commentMutations: Pick<
           data: deletedComment,
         },
       },
-      `Comment published to comment:DELETED:${dbComment.postId}`
+      `Comment published to comment:DELETED:${deletedComment.post}`
     );
     return true;
   },
   updateComment: async (
     _parent,
     { id, data }: MutationUpdateCommentArgs,
-    { pubsub }: GraphQLContext
+    { pubsub, user }: GraphQLContext
   ) => {
-    const dbComment = await updateComment(id, data);
-    const updatedComment = mapDBCommentToComment(dbComment);
+    const updatedComment = await commentService.updateComment(id, data, user);
 
     commentLogger.info({ comment: updatedComment }, "Comment updated");
 
-    pubsub.publish(`comment:${dbComment.postId}`, {
+    pubsub.publish(`comment:${updatedComment.post!.id}`, {
       type: "UPDATED",
       data: updatedComment,
     });
@@ -85,7 +77,7 @@ export const commentMutations: Pick<
           data: updatedComment,
         },
       },
-      `Comment published to comment:UPDATED:${dbComment.postId}`
+      `Comment published to comment:UPDATED:${updatedComment.post!.id}`
     );
 
     return updatedComment;

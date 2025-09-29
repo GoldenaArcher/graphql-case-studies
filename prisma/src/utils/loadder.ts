@@ -27,10 +27,6 @@ export function createBatchLoader<K extends string | number, V>(
                 resultMap[strKey].push(item);
             }
         }
-
-        console.log('resultMap',resultMap);
-
-
         return keys.map((key) => resultMap[String(key)] || []);
     });
 }

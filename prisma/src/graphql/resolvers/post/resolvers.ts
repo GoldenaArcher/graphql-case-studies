@@ -7,7 +7,7 @@ import { mapDBUserToUser } from "../user/user.mappers";
 export const postResolvers: PostResolvers = {
   async comments(parent, _args, context: GraphQLContext) {
     const comments = await context.loaders.commentByPostLoader.load(parent.id);
-    return comments.map(mapDBCommentToComment);
+    return comments.map(comment => mapDBCommentToComment(comment));
   },
   async author(parent, _args, context: GraphQLContext) {
     const user = await context.loaders.userByPostLoader.load(parent.id);
