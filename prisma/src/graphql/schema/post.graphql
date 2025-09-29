@@ -31,7 +31,7 @@ extend type Query {
   For public API, this query will only return published posts.
   For private API, it will return all posts.
   """
-  posts(where: PostWhereInput, first: Int, skip: Int): [Post]!
+  posts(where: PostWhereInput, first: Int, skip: Int, after: String): [Post]!
   post(id: ID!): Post!
 }
 

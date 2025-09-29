@@ -121,7 +121,7 @@ const findPostById = async (id: string) => {
     return mapDBPostToPost(post);
 }
 
-const findAvailablePosts = async (where?: PostWhereInput, first?: number | null, skip?: number | null) => {
+const findAvailablePosts = async (where?: PostWhereInput, first?: number | null, skip?: number | null, after?: string | null) => {
     const cleaned: Prisma.PostWhereInput = {
         published: true,
         archived: false,
@@ -133,7 +133,8 @@ const findAvailablePosts = async (where?: PostWhereInput, first?: number | null,
     const args: Prisma.PostFindManyArgs = buildFindManyArgs<Prisma.PostFindManyArgs>(
         cleaned,
         first,
-        skip
+        skip,
+        after
     );
 
     return (await postRepository.findPosts(args)).map(mapDBPostToPost);

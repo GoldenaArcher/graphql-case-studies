@@ -18,8 +18,18 @@ input UpdateCommentInput {
   archived: Boolean
 }
 
+input CommentWhereInput {
+  text: StringFilter
+  orphaned: Boolean
+  archived: Boolean
+}
+
 extend type Query {
-  comments(query: String): [Comment]!
+  """
+  For public API, this query will only return non-archived comments.
+  For private API, it will return all comments.
+  """
+  comments(where: CommentWhereInput, first: Int, skip: Int, after: String): [Comment]!
 }
 
 extend type Mutation {

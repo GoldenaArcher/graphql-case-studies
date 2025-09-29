@@ -47,6 +47,12 @@ export type CommentEvent = {
   type: EventType;
 };
 
+export type CommentWhereInput = {
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  orphaned?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<StringFilter>;
+};
+
 export type Connection = {
   aggregate: Aggregate;
   pageInfo: PageInfo;
@@ -186,6 +192,10 @@ export type PostWhereInput = {
 
 export type Query = {
   __typename?: 'Query';
+  /**
+   * For public API, this query will only return non-archived comments.
+   * For private API, it will return all comments.
+   */
   comments: Array<Maybe<Comment>>;
   me: User;
   post: Post;
@@ -198,12 +208,15 @@ export type Query = {
    * For public API, this query will only return active users.
    * For private API, it will return all users.
    */
-  users: Array<Maybe<User>>;
+  users: UserConnection;
 };
 
 
 export type QueryCommentsArgs = {
-  query?: InputMaybe<Scalars['String']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  where?: InputMaybe<CommentWhereInput>;
 };
 
 
@@ -213,6 +226,7 @@ export type QueryPostArgs = {
 
 
 export type QueryPostsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PostWhereInput>;
@@ -220,6 +234,7 @@ export type QueryPostsArgs = {
 
 
 export type QueryUsersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<UserWhereInput>;
@@ -392,6 +407,7 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
   CommentEvent: ResolverTypeWrapper<CommentEvent>;
+  CommentWhereInput: CommentWhereInput;
   Connection: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Connection']>;
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
@@ -427,6 +443,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
   CommentEvent: CommentEvent;
+  CommentWhereInput: CommentWhereInput;
   Connection: ResolversInterfaceTypes<ResolversParentTypes>['Connection'];
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
@@ -525,7 +542,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   post?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<QueryPostArgs, 'id'>>;
   posts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType, Partial<QueryPostsArgs>>;
-  users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
+  users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, Partial<QueryUsersArgs>>;
 };
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {

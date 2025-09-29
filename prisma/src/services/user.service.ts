@@ -1,7 +1,14 @@
 import type { Prisma } from "../../generated/prisma";
-import type { UpdateUserInput, User, UserWhereInput } from "../generated/graphql";
+import type {
+    UpdateUserInput,
+    User,
+    UserWhereInput,
+} from "../generated/graphql";
 
-import { mapDBUserToUser } from "../graphql/resolvers/user/user.mappers";
+import {
+    buildUserConnection,
+    mapDBUserToUser,
+} from "../graphql/resolvers/user/user.mappers";
 import userRepository from "../prisma/repository/user.repo";
 import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";
@@ -10,31 +17,47 @@ const findById = async (id: string) => {
     const user = await userRepository.findUserById(id);
     if (!user) throw new Error("User not found");
     return mapDBUserToUser(user);
-}
+};
 
-export const findActiveUsers = async (where?: UserWhereInput, first?: number | null, skip?: number | null) => {
+export const findActiveUsers = async (
+    where?: UserWhereInput,
+    first?: number | null,
+    skip?: number | null,
+    after?: string | null | undefined,
+) => {
     const cleaned: Prisma.UserWhereInput = { active: true };
 
     if (where?.email) cleaned.email = { ...where.email } as Prisma.StringFilter;
     if (where?.name) cleaned.name = { ...where.name } as Prisma.StringFilter;
 
-    const args: Prisma.UserFindManyArgs = buildFindManyArgs<Prisma.UserFindManyArgs>(
-        cleaned,
-        first,
-        skip
-    );
+    const args: Prisma.UserFindManyArgs =
+        buildFindManyArgs<Prisma.UserFindManyArgs>(cleaned, first, skip, after);
 
-    return (await userRepository.findUsers(args)).map(mapDBUserToUser);
-}
+    const [users, hasNextPage, totalCount] = await Promise.all([
+        userRepository.findUsers(args),
+        userRepository.hasNextPage(
+            after ?? "",
+            args.orderBy as Prisma.UserOrderByWithRelationInput[],
+            cleaned,
+        ),
+        userRepository.getTotalCount(cleaned),
+    ]);
 
-const updateUser = async (id: string, data: UpdateUserInput, user: User | null | undefined) => {
+    return buildUserConnection(users, after, hasNextPage, totalCount);
+};
+
+const updateUser = async (
+    id: string,
+    data: UpdateUserInput,
+    user: User | null | undefined,
+) => {
     const dbUser = await userRepository.findUserById(id);
     if (!dbUser) {
-        throw new Error('User not found');
+        throw new Error("User not found");
     }
 
     if (!authService.checkIsSameUser(user, id)) {
-        throw new Error('User not authorized to update this user');
+        throw new Error("User not authorized to update this user");
     }
 
     const payload: Prisma.UserUpdateInput = {};
@@ -48,12 +71,12 @@ const updateUser = async (id: string, data: UpdateUserInput, user: User | null |
     }
 
     return await userRepository.updateUser(id, payload);
-}
+};
 
 const userService = {
     findById,
     findActiveUsers,
     updateUser,
-}
+};
 
 export default userService;

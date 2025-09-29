@@ -1,9 +1,10 @@
 import type { Prisma } from "../../generated/prisma";
-import type { Comment, CreateCommentInput, Post, UpdateCommentInput, User } from "../generated/graphql";
+import type { Comment, CommentWhereInput, CreateCommentInput, Post, UpdateCommentInput, User } from "../generated/graphql";
 
 import { mapDBCommentToComment } from "../graphql/resolvers/comment/comment.mapper";
 import commentRepository from "../prisma/repository/comment.repo";
 import userRepository from "../prisma/repository/user.repo";
+import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";
 import postService from "./post.service";
 
@@ -39,8 +40,19 @@ const checkCommentCanBeUpdated = async (id: string, user: User | null | undefine
     return [true, post];
 }
 
-const findAvailableComments = async (): Promise<Comment[]> => {
-    return (await commentRepository.getNonArchivedComments()).map((dbComment) => mapDBCommentToComment(dbComment));
+const findAvailableComments = async (where?: CommentWhereInput, first?: number | null, skip?: number | null, after?: string | null): Promise<Comment[]> => {
+    const cleaned: Prisma.CommentWhereInput = {};
+
+    if (where?.text) cleaned.text = { ...where.text } as Prisma.StringFilter;
+
+    const args: Prisma.CommentFindManyArgs = buildFindManyArgs<Prisma.CommentFindManyArgs>(
+        cleaned,
+        first,
+        skip,
+        after
+    );
+
+    return (await commentRepository.getNonArchivedComments(args)).map((dbComment) => mapDBCommentToComment(dbComment));
 }
 
 const findCommentById = async (id: string): Promise<Comment | null> => {

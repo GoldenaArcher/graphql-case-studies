@@ -9,9 +9,10 @@ const getCommentById = async (id: string): Promise<Comment | null> => {
     });
 };
 
-const getNonArchivedComments = async (): Promise<Comment[]> => {
+const getNonArchivedComments = async (args?: Prisma.CommentFindManyArgs): Promise<Comment[]> => {
     return await repo.findMany({
-        where: { archived: false }
+        ...args,
+        where: { ...args?.where, archived: false }
     });
 };
 

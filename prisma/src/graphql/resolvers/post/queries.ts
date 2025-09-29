@@ -4,5 +4,5 @@ import postService from "../../../services/post.service";
 
 export const postQueries: Pick<QueryResolvers, "post" | "posts"> = {
   post: async (_parent, { id }): Promise<Post> => await postService.findPostById(id),
-  posts: async (_parent, { where, first, skip }): Promise<Post[]> => await postService.findAvailablePosts(where ?? undefined, first, skip),
+  posts: async (_parent, { where, first, skip, after }): Promise<Post[]> => await postService.findAvailablePosts(where ?? undefined, first, skip, after),
 };

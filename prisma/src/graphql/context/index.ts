@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 import type { User } from "../../generated/graphql";
 import type { GraphQLContext } from "./type";
@@ -10,7 +9,11 @@ import { logger } from "../../utils/logger";
 import userService from "../../services/user.service";
 import authService from "../../services/auth.service";
 
-const context = async ({ request }: { request: Request }): Promise<GraphQLContext> => {
+const context = async ({
+    request,
+}: {
+    request: Request;
+}): Promise<Partial<GraphQLContext>> => {
     const requestId = randomUUID();
     let user: User | null = null;
 
@@ -23,18 +26,18 @@ const context = async ({ request }: { request: Request }): Promise<GraphQLContex
             if (scheme !== "Bearer" || !token) {
                 throw new Error("Invalid auth header format");
             }
-            
+
             const userId = authService.verifyToken(token, requestId);
             user = await userService.findById(userId);
         }
     } else {
         logger.info(
             { requestId },
-            "Incoming WS subscription or non-HTTP request"
+            "Incoming WS subscription or non-HTTP request",
         );
     }
 
     return { pubsub, requestId, loaders: createLoaders(), user };
-}
+};
 
 export default context;
