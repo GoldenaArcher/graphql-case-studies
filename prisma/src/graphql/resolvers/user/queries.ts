@@ -14,9 +14,9 @@ export const userQueries: Pick<QueryResolvers, "me" | "users"> = {
     if (!user) throw new Error("User not authenticated or not found");
     return user
   },
-  users: async (_parent, { where }: QueryUsersArgs): Promise<User[]> => {
-    userLogger.info({ where }, "Fetching users with filter");
+  users: async (_parent, { where, first, skip }: QueryUsersArgs): Promise<User[]> => {
+    userLogger.info({ where, first, skip }, "Fetching users with filter");
 
-    return await userService.findActiveUsers(where ?? undefined);
+    return await userService.findActiveUsers(where ?? undefined, first, skip);
   },
 };

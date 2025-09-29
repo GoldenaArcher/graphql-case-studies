@@ -1,3 +1,4 @@
+import type { YogaInitialContext } from "graphql-yoga";
 import type { Post, Comment, EventType, User } from "../../generated/graphql";
 import type { createLoaders } from "../loaders";
 import type { pubsub } from "./pubsub";
@@ -32,4 +33,4 @@ export type GraphQLContext = {
   requestId?: string;
   loaders: ReturnType<typeof createLoaders>;
   user?: User | null;
-};
+} & YogaInitialContext;

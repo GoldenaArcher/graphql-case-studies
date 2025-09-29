@@ -10,6 +10,7 @@ import type { GraphQLContext } from "./graphql/context/type";
 import context from "./graphql/context";
 
 import { logger } from "./utils/logger";
+import { createRequestLoggerPlugin } from "./graphql/plugins/loggingPlugin";
 
 const yogaApp = createYoga<GraphQLContext>({
   schema,
@@ -25,6 +26,9 @@ const yogaApp = createYoga<GraphQLContext>({
     warn: (msg) => logger.warn(msg),
     error: (msg) => logger.error(msg),
   },
+  plugins: [
+    createRequestLoggerPlugin(logger),
+  ],
 });
 
 const httpServer = http.createServer(yogaApp);

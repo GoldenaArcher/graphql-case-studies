@@ -20,3 +20,19 @@ enum QueryMode {
   default
   insensitive
 }
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+interface Connection {
+  pageInfo: PageInfo!
+  aggregate: Aggregate!
+}
+
+interface Aggregate {
+  count: Int!
+}

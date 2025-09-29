@@ -27,7 +27,11 @@ input PostWhereInput {
 }
 
 extend type Query {
-  posts(where: PostWhereInput): [Post]!
+  """
+  For public API, this query will only return published posts.
+  For private API, it will return all posts.
+  """
+  posts(where: PostWhereInput, first: Int, skip: Int): [Post]!
   post(id: ID!): Post!
 }
 

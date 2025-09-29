@@ -16,6 +16,15 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type Aggregate = {
+  count: Scalars['Int']['output'];
+};
+
+export type AggregateUser = Aggregate & {
+  __typename?: 'AggregateUser';
+  count: Scalars['Int']['output'];
+};
+
 export type AuthPayload = {
   __typename?: 'AuthPayload';
   token: Scalars['String']['output'];
@@ -36,6 +45,11 @@ export type CommentEvent = {
   __typename?: 'CommentEvent';
   data?: Maybe<Comment>;
   type: EventType;
+};
+
+export type Connection = {
+  aggregate: Aggregate;
+  pageInfo: PageInfo;
 };
 
 export type CreateCommentInput = {
@@ -139,6 +153,14 @@ export type MutationUpdateUserArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars['Boolean']['output'];
+  startCursor?: Maybe<Scalars['String']['output']>;
+};
+
 export type Post = {
   __typename?: 'Post';
   author?: Maybe<User>;
@@ -167,7 +189,15 @@ export type Query = {
   comments: Array<Maybe<Comment>>;
   me: User;
   post: Post;
+  /**
+   * For public API, this query will only return published posts.
+   * For private API, it will return all posts.
+   */
   posts: Array<Maybe<Post>>;
+  /**
+   * For public API, this query will only return active users.
+   * For private API, it will return all users.
+   */
   users: Array<Maybe<User>>;
 };
 
@@ -183,11 +213,15 @@ export type QueryPostArgs = {
 
 
 export type QueryPostsArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<PostWhereInput>;
 };
 
 
 export type QueryUsersArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<UserWhereInput>;
 };
 
@@ -253,6 +287,19 @@ export type User = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   posts: Array<Maybe<Post>>;
+};
+
+export type UserConnection = Connection & {
+  __typename?: 'UserConnection';
+  aggregate: AggregateUser;
+  edges: Array<UserEdge>;
+  pageInfo: PageInfo;
+};
+
+export type UserEdge = {
+  __typename?: 'UserEdge';
+  cursor: Scalars['String']['output'];
+  node: User;
 };
 
 export type UserWhereInput = {
@@ -331,13 +378,21 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 
 
 
+/** Mapping of interface types */
+export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
+  Aggregate: ( AggregateUser );
+  Connection: ( UserConnection );
+};
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  Aggregate: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Aggregate']>;
+  AggregateUser: ResolverTypeWrapper<AggregateUser>;
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
   CommentEvent: ResolverTypeWrapper<CommentEvent>;
+  Connection: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Connection']>;
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
   EventType: EventType;
@@ -345,6 +400,7 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
   Post: ResolverTypeWrapper<Post>;
   PostEvent: ResolverTypeWrapper<PostEvent>;
   PostWhereInput: PostWhereInput;
@@ -358,21 +414,27 @@ export type ResolversTypes = {
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
   User: ResolverTypeWrapper<User>;
+  UserConnection: ResolverTypeWrapper<UserConnection>;
+  UserEdge: ResolverTypeWrapper<UserEdge>;
   UserWhereInput: UserWhereInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  Aggregate: ResolversInterfaceTypes<ResolversParentTypes>['Aggregate'];
+  AggregateUser: AggregateUser;
   AuthPayload: AuthPayload;
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
   CommentEvent: CommentEvent;
+  Connection: ResolversInterfaceTypes<ResolversParentTypes>['Connection'];
   CreateCommentInput: CreateCommentInput;
   CreatePostInput: CreatePostInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   LoginInput: LoginInput;
   Mutation: Record<PropertyKey, never>;
+  PageInfo: PageInfo;
   Post: Post;
   PostEvent: PostEvent;
   PostWhereInput: PostWhereInput;
@@ -385,7 +447,18 @@ export type ResolversParentTypes = {
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
   User: User;
+  UserConnection: UserConnection;
+  UserEdge: UserEdge;
   UserWhereInput: UserWhereInput;
+};
+
+export type AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['Aggregate'] = ResolversParentTypes['Aggregate']> = {
+  __resolveType: TypeResolveFn<'AggregateUser', ParentType, ContextType>;
+};
+
+export type AggregateUserResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateUser'] = ResolversParentTypes['AggregateUser']> = {
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type AuthPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload']> = {
@@ -407,6 +480,10 @@ export type CommentEventResolvers<ContextType = any, ParentType extends Resolver
   type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
 };
 
+export type ConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Connection'] = ResolversParentTypes['Connection']> = {
+  __resolveType: TypeResolveFn<'UserConnection', ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   activateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationActivateUserArgs, 'id'>>;
   createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'data'>>;
@@ -420,6 +497,13 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   updateComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationUpdateCommentArgs, 'data' | 'id'>>;
   updatePost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationUpdatePostArgs, 'data' | 'id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'data' | 'id'>>;
+};
+
+export type PageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
+  endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
 export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
@@ -460,15 +544,33 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   posts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType>;
 };
 
+export type UserConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserConnection'] = ResolversParentTypes['UserConnection']> = {
+  aggregate?: Resolver<ResolversTypes['AggregateUser'], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes['UserEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UserEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserEdge'] = ResolversParentTypes['UserEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
+  Aggregate?: AggregateResolvers<ContextType>;
+  AggregateUser?: AggregateUserResolvers<ContextType>;
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Comment?: CommentResolvers<ContextType>;
   CommentEvent?: CommentEventResolvers<ContextType>;
+  Connection?: ConnectionResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   PostEvent?: PostEventResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserConnection?: UserConnectionResolvers<ContextType>;
+  UserEdge?: UserEdgeResolvers<ContextType>;
 };
 

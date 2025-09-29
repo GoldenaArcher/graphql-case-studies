@@ -23,8 +23,8 @@ const findPostById = async (postId: string): Promise<Post | null> => {
     });
 }
 
-const findPosts = async (where: Prisma.PostWhereInput): Promise<Post[]> => {
-    return await prisma.post.findMany({ where });
+const findPosts = async (args: Prisma.PostFindManyArgs): Promise<Post[]> => {
+    return await prisma.post.findMany(args);
 }
 
 const createPost = async (data: Prisma.PostCreateInput): Promise<Post> => {

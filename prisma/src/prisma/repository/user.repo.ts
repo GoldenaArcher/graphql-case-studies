@@ -14,7 +14,7 @@ const checkUserExistsAndIsActive = async (id: string | null | undefined) => {
     if (!id) {
         return false;
     }
-    
+
     return !!(await repo.findUnique({
         where: { id, active: true },
         select: { id: true },
@@ -73,8 +73,8 @@ const deactivateUser = async (id: string): Promise<User> => {
     return updateUser(id, { active: false });
 }
 
-const findUsers = async (where: Prisma.UserWhereInput): Promise<User[]> => {
-    return await prisma.user.findMany({ where });
+const findUsers = async (args: Prisma.UserFindManyArgs): Promise<User[]> => {
+    return await repo.findMany(args);
 };
 
 const findUserByEmail = async (email: string): Promise<User | null> => {

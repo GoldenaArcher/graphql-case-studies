@@ -3,6 +3,7 @@ import type { UpdateUserInput, User, UserWhereInput } from "../generated/graphql
 
 import { mapDBUserToUser } from "../graphql/resolvers/user/user.mappers";
 import userRepository from "../prisma/repository/user.repo";
+import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";
 
 const findById = async (id: string) => {
@@ -11,13 +12,19 @@ const findById = async (id: string) => {
     return mapDBUserToUser(user);
 }
 
-export const findActiveUsers = async (where?: UserWhereInput) => {
+export const findActiveUsers = async (where?: UserWhereInput, first?: number | null, skip?: number | null) => {
     const cleaned: Prisma.UserWhereInput = { active: true };
 
     if (where?.email) cleaned.email = { ...where.email } as Prisma.StringFilter;
     if (where?.name) cleaned.name = { ...where.name } as Prisma.StringFilter;
 
-    return (await userRepository.findUsers(cleaned)).map(mapDBUserToUser);
+    const args: Prisma.UserFindManyArgs = buildFindManyArgs<Prisma.UserFindManyArgs>(
+        cleaned,
+        first,
+        skip
+    );
+
+    return (await userRepository.findUsers(args)).map(mapDBUserToUser);
 }
 
 const updateUser = async (id: string, data: UpdateUserInput, user: User | null | undefined) => {

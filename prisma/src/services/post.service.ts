@@ -6,6 +6,7 @@ import commentRepository from "../prisma/repository/comment.repo";
 import postRepository from "../prisma/repository/post.repo";
 import userRepository from "../prisma/repository/user.repo";
 import { postLogger } from "../utils/logger";
+import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";
 
 const createPost = async (data: CreatePostInput, user: User | null | undefined) => {
@@ -120,7 +121,7 @@ const findPostById = async (id: string) => {
     return mapDBPostToPost(post);
 }
 
-const findAvailablePosts = async (where?: PostWhereInput) => {
+const findAvailablePosts = async (where?: PostWhereInput, first?: number | null, skip?: number | null) => {
     const cleaned: Prisma.PostWhereInput = {
         published: true,
         archived: false,
@@ -129,7 +130,13 @@ const findAvailablePosts = async (where?: PostWhereInput) => {
     if (where?.title) cleaned.title = { ...where.title } as Prisma.StringFilter
     if (where?.body) cleaned.body = { ...where.body } as Prisma.StringFilter
 
-    return (await postRepository.findPosts(cleaned)).map(mapDBPostToPost);
+    const args: Prisma.PostFindManyArgs = buildFindManyArgs<Prisma.PostFindManyArgs>(
+        cleaned,
+        first,
+        skip
+    );
+
+    return (await postRepository.findPosts(args)).map(mapDBPostToPost);
 }
 
 const checkPostExists = async (id: string) => {

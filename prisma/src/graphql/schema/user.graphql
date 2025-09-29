@@ -21,8 +21,27 @@ input UserWhereInput {
   active: Boolean
 }
 
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type AggregateUser implements Aggregate {
+  count: Int!
+}
+
+type UserConnection implements Connection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  aggregate: AggregateUser!
+}
+
 extend type Query {
-  users(where: UserWhereInput): [User]!
+  """
+  For public API, this query will only return active users.
+  For private API, it will return all users.
+  """
+  users(where: UserWhereInput, first: Int, skip: Int): [User]!
   me: User!
 }
 
