@@ -1,5 +1,5 @@
-import type { Post, Prisma } from '../../../generated/prisma';
-import prisma from '../index';
+import type { Post, Prisma } from "../../../generated/prisma";
+import prisma from "../index";
 
 const repo = prisma.post;
 
@@ -8,55 +8,82 @@ const checkPostExists = async (postId: string) => {
         where: { id: postId },
         select: { id: true },
     }));
-}
+};
 
 const checkPostIsPublished = async (postId: string) => {
     return !!(await prisma.post.findUnique({
         where: { id: postId },
         select: { published: true },
     }));
-}
+};
 
 const findPostById = async (postId: string): Promise<Post | null> => {
     return await prisma.post.findUnique({
         where: { id: postId },
     });
-}
+};
 
 const findPosts = async (args: Prisma.PostFindManyArgs): Promise<Post[]> => {
     return await prisma.post.findMany(args);
-}
+};
 
 const createPost = async (data: Prisma.PostCreateInput): Promise<Post> => {
     return await repo.create({ data });
-}
+};
 
-const updatePost = async (postId: string, data: Prisma.PostUpdateInput): Promise<Post> => {
+const updatePost = async (
+    postId: string,
+    data: Prisma.PostUpdateInput,
+): Promise<Post> => {
     if (!(await checkPostExists(postId))) {
-        throw new Error('Post not found');
+        throw new Error("Post not found");
     }
 
     return await prisma.post.update({
         where: { id: postId },
         data,
     });
-}
+};
 
 const archivePost = async (postId: string): Promise<Post> => {
     const post = await findPostById(postId);
 
     if (!post || post.archived || !post.published) {
-        throw new Error('Post does not exist.');
+        throw new Error("Post does not exist.");
     }
 
     const archivedPost = await updatePost(postId, { archived: true });
 
     return archivedPost;
-}
+};
 
 const publishPost = async (postId: string): Promise<Post> => {
     return updatePost(postId, { published: true });
-}
+};
+
+const hasNextPage = async (
+    cursorId: string,
+    orderBy:
+        | Prisma.PostOrderByWithRelationInput
+        | Prisma.PostOrderByWithRelationInput[],
+    where: Prisma.PostWhereInput,
+): Promise<boolean> => {
+    const next = await repo.count({
+        where: {
+            ...where,
+            id: { gt: cursorId },
+        },
+        orderBy,
+    });
+
+    return !!next;
+};
+
+const getTotalCount = async (where: Prisma.PostWhereInput): Promise<number> => {
+    return await repo.count({
+        where,
+    });
+};
 
 const postRepository = {
     checkPostExists,
@@ -67,6 +94,8 @@ const postRepository = {
     updatePost,
     archivePost,
     publishPost,
-}
+    hasNextPage,
+    getTotalCount,
+};
 
 export default postRepository;

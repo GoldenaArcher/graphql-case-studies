@@ -24,12 +24,27 @@ input CommentWhereInput {
   archived: Boolean
 }
 
+type CommentEdge {
+  node: Comment!
+  cursor: String!
+}
+
+type AggregateComment implements Aggregate {
+  count: Int!
+}
+
+type CommentConnection implements Connection {
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+  aggregate: AggregateComment!
+}
+
 extend type Query {
   """
   For public API, this query will only return non-archived comments.
   For private API, it will return all comments.
   """
-  comments(where: CommentWhereInput, first: Int, skip: Int, after: String): [Comment]!
+  comments(where: CommentWhereInput, first: Int, skip: Int, after: String): CommentConnection!
 }
 
 extend type Mutation {

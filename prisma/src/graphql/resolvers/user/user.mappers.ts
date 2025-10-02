@@ -1,11 +1,6 @@
-import type {
-    AggregateUser,
-    PageInfo,
-    User,
-    UserConnection,
-    UserEdge,
-} from "../../../generated/graphql";
+import type { User, UserConnection } from "../../../generated/graphql";
 import type { User as DbUser } from "../../../../generated/prisma";
+import { buildConnection } from "../../../utils/prisma";
 
 export const mapDBUserToUser = (data: DbUser): User => {
     return {
@@ -21,26 +16,11 @@ export const buildUserConnection = (
     hasNextPage: boolean,
     totalCount: number,
 ): UserConnection => {
-    const edges: UserEdge[] = users.map((user) => ({
-        node: mapDBUserToUser(user),
-        cursor: user.id,
-    }));
-
-    const pageInfo: PageInfo = {
+    return buildConnection(
+        users,
+        after,
         hasNextPage,
-        hasPreviousPage: Boolean(after),
-        startCursor: edges.length > 0 ? edges[0]?.cursor ?? null : null,
-        endCursor:
-            edges.length > 0 ? edges[edges.length - 1]?.cursor ?? null : null,
-    };
-
-    const aggregate: AggregateUser = {
-        count: totalCount,
-    };
-
-    return {
-        edges,
-        pageInfo,
-        aggregate,
-    };
+        totalCount,
+        mapDBUserToUser,
+    );
 };

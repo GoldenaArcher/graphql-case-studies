@@ -2,6 +2,7 @@ import type { Prisma } from "../../generated/prisma";
 import type {
     UpdateUserInput,
     User,
+    UserConnection,
     UserWhereInput,
 } from "../generated/graphql";
 
@@ -24,7 +25,7 @@ export const findActiveUsers = async (
     first?: number | null,
     skip?: number | null,
     after?: string | null | undefined,
-) => {
+): Promise<UserConnection> => {
     const cleaned: Prisma.UserWhereInput = { active: true };
 
     if (where?.email) cleaned.email = { ...where.email } as Prisma.StringFilter;

@@ -20,6 +20,16 @@ export type Aggregate = {
   count: Scalars['Int']['output'];
 };
 
+export type AggregateComment = Aggregate & {
+  __typename?: 'AggregateComment';
+  count: Scalars['Int']['output'];
+};
+
+export type AggregatePost = Aggregate & {
+  __typename?: 'AggregatePost';
+  count: Scalars['Int']['output'];
+};
+
 export type AggregateUser = Aggregate & {
   __typename?: 'AggregateUser';
   count: Scalars['Int']['output'];
@@ -39,6 +49,19 @@ export type Comment = {
   orphaned?: Maybe<Scalars['Boolean']['output']>;
   post?: Maybe<Post>;
   text: Scalars['String']['output'];
+};
+
+export type CommentConnection = Connection & {
+  __typename?: 'CommentConnection';
+  aggregate: AggregateComment;
+  edges: Array<CommentEdge>;
+  pageInfo: PageInfo;
+};
+
+export type CommentEdge = {
+  __typename?: 'CommentEdge';
+  cursor: Scalars['String']['output'];
+  node: Comment;
 };
 
 export type CommentEvent = {
@@ -177,6 +200,19 @@ export type Post = {
   title: Scalars['String']['output'];
 };
 
+export type PostConnection = Connection & {
+  __typename?: 'PostConnection';
+  aggregate: AggregatePost;
+  edges: Array<PostEdge>;
+  pageInfo: PageInfo;
+};
+
+export type PostEdge = {
+  __typename?: 'PostEdge';
+  cursor: Scalars['String']['output'];
+  node: Post;
+};
+
 export type PostEvent = {
   __typename?: 'PostEvent';
   data?: Maybe<Post>;
@@ -196,14 +232,14 @@ export type Query = {
    * For public API, this query will only return non-archived comments.
    * For private API, it will return all comments.
    */
-  comments: Array<Maybe<Comment>>;
+  comments: CommentConnection;
   me: User;
   post: Post;
   /**
    * For public API, this query will only return published posts.
    * For private API, it will return all posts.
    */
-  posts: Array<Maybe<Post>>;
+  posts: PostConnection;
   /**
    * For public API, this query will only return active users.
    * For private API, it will return all users.
@@ -395,17 +431,29 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
-  Aggregate: ( AggregateUser );
-  Connection: ( UserConnection );
+  Aggregate:
+    | ( AggregateComment )
+    | ( AggregatePost )
+    | ( AggregateUser )
+  ;
+  Connection:
+    | ( CommentConnection )
+    | ( PostConnection )
+    | ( UserConnection )
+  ;
 };
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Aggregate: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Aggregate']>;
+  AggregateComment: ResolverTypeWrapper<AggregateComment>;
+  AggregatePost: ResolverTypeWrapper<AggregatePost>;
   AggregateUser: ResolverTypeWrapper<AggregateUser>;
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
+  CommentConnection: ResolverTypeWrapper<CommentConnection>;
+  CommentEdge: ResolverTypeWrapper<CommentEdge>;
   CommentEvent: ResolverTypeWrapper<CommentEvent>;
   CommentWhereInput: CommentWhereInput;
   Connection: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Connection']>;
@@ -418,6 +466,8 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Post: ResolverTypeWrapper<Post>;
+  PostConnection: ResolverTypeWrapper<PostConnection>;
+  PostEdge: ResolverTypeWrapper<PostEdge>;
   PostEvent: ResolverTypeWrapper<PostEvent>;
   PostWhereInput: PostWhereInput;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -438,10 +488,14 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Aggregate: ResolversInterfaceTypes<ResolversParentTypes>['Aggregate'];
+  AggregateComment: AggregateComment;
+  AggregatePost: AggregatePost;
   AggregateUser: AggregateUser;
   AuthPayload: AuthPayload;
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
+  CommentConnection: CommentConnection;
+  CommentEdge: CommentEdge;
   CommentEvent: CommentEvent;
   CommentWhereInput: CommentWhereInput;
   Connection: ResolversInterfaceTypes<ResolversParentTypes>['Connection'];
@@ -453,6 +507,8 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   PageInfo: PageInfo;
   Post: Post;
+  PostConnection: PostConnection;
+  PostEdge: PostEdge;
   PostEvent: PostEvent;
   PostWhereInput: PostWhereInput;
   Query: Record<PropertyKey, never>;
@@ -470,7 +526,17 @@ export type ResolversParentTypes = {
 };
 
 export type AggregateResolvers<ContextType = any, ParentType extends ResolversParentTypes['Aggregate'] = ResolversParentTypes['Aggregate']> = {
-  __resolveType: TypeResolveFn<'AggregateUser', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AggregateComment' | 'AggregatePost' | 'AggregateUser', ParentType, ContextType>;
+};
+
+export type AggregateCommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateComment'] = ResolversParentTypes['AggregateComment']> = {
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AggregatePostResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregatePost'] = ResolversParentTypes['AggregatePost']> = {
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type AggregateUserResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateUser'] = ResolversParentTypes['AggregateUser']> = {
@@ -492,13 +558,25 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
+export type CommentConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentConnection'] = ResolversParentTypes['CommentConnection']> = {
+  aggregate?: Resolver<ResolversTypes['AggregateComment'], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes['CommentEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CommentEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentEdge'] = ResolversParentTypes['CommentEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
+};
+
 export type CommentEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentEvent'] = ResolversParentTypes['CommentEvent']> = {
   data?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
 };
 
 export type ConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Connection'] = ResolversParentTypes['Connection']> = {
-  __resolveType: TypeResolveFn<'UserConnection', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'CommentConnection' | 'PostConnection' | 'UserConnection', ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -532,16 +610,28 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
+export type PostConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['PostConnection'] = ResolversParentTypes['PostConnection']> = {
+  aggregate?: Resolver<ResolversTypes['AggregatePost'], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes['PostEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PostEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['PostEdge'] = ResolversParentTypes['PostEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+};
+
 export type PostEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['PostEvent'] = ResolversParentTypes['PostEvent']> = {
   data?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  comments?: Resolver<Array<Maybe<ResolversTypes['Comment']>>, ParentType, ContextType, Partial<QueryCommentsArgs>>;
+  comments?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, Partial<QueryCommentsArgs>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   post?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<QueryPostArgs, 'id'>>;
-  posts?: Resolver<Array<Maybe<ResolversTypes['Post']>>, ParentType, ContextType, Partial<QueryPostsArgs>>;
+  posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, Partial<QueryPostsArgs>>;
   users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, Partial<QueryUsersArgs>>;
 };
 
@@ -575,14 +665,20 @@ export type UserEdgeResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type Resolvers<ContextType = any> = {
   Aggregate?: AggregateResolvers<ContextType>;
+  AggregateComment?: AggregateCommentResolvers<ContextType>;
+  AggregatePost?: AggregatePostResolvers<ContextType>;
   AggregateUser?: AggregateUserResolvers<ContextType>;
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Comment?: CommentResolvers<ContextType>;
+  CommentConnection?: CommentConnectionResolvers<ContextType>;
+  CommentEdge?: CommentEdgeResolvers<ContextType>;
   CommentEvent?: CommentEventResolvers<ContextType>;
   Connection?: ConnectionResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PageInfo?: PageInfoResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
+  PostConnection?: PostConnectionResolvers<ContextType>;
+  PostEdge?: PostEdgeResolvers<ContextType>;
   PostEvent?: PostEventResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;

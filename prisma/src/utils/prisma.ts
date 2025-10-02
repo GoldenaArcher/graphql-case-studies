@@ -32,3 +32,33 @@ export function buildFindManyArgs<
 
     return args as T;
 }
+
+export function buildConnection<TNode, TDbEntity extends { id: string }, TConnection>(
+    items: TDbEntity[],
+    after: string | null | undefined,
+    hasNextPage: boolean,
+    totalCount: number,
+    mapper: (item: TDbEntity) => TNode
+): TConnection {
+    const edges = items.map((item) => ({
+        node: mapper(item),
+        cursor: item.id,
+    }));
+
+    const pageInfo = {
+        hasNextPage,
+        hasPreviousPage: Boolean(after),
+        startCursor: edges.length > 0 ? edges[0]?.cursor ?? null : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1]?.cursor ?? null : null,
+    };
+
+    const aggregate = {
+        count: totalCount,
+    };
+
+    return {
+        edges,
+        pageInfo,
+        aggregate,
+    } as TConnection;
+}

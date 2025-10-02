@@ -81,13 +81,13 @@ const findUsers = async (args: Prisma.UserFindManyArgs): Promise<User[]> => {
 };
 
 const findUserByEmail = async (email: string): Promise<User | null> => {
-    return await prisma.user.findUnique({
+    return await repo.findUnique({
         where: { email },
     });
 };
 
 const findUserById = async (id: string): Promise<User | null> => {
-    return await prisma.user.findUnique({
+    return await repo.findUnique({
         where: { id },
     });
 };
