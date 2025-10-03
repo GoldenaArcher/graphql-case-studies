@@ -17,7 +17,7 @@ export const commentMutations: Pick<
   createComment: async (
     _parent,
     { data }: MutationCreateCommentArgs,
-    { pubsub, user }: GraphQLContext
+    { pubsub, user }
   ) => {
     const newComment = await commentService.createComment(data, user);
 

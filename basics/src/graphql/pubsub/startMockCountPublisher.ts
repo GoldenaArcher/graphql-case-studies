@@ -1,4 +1,4 @@
-import { pubsub } from "../context";
+import { pubsub } from "../context/pubsub";
 
 export function startMockCountPublisher() {
   let count = 0;
