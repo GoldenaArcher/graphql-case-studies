@@ -9,46 +9,50 @@ import type {
     User,
 } from "../generated/graphql";
 
+import authService from "./auth.service";
+import postService from "./post.service";
+
 import {
     buildCommentConnection,
     mapDBCommentToComment,
 } from "../graphql/resolvers/comment/comment.mapper";
 import commentRepository from "../prisma/repository/comment.repo";
 import userRepository from "../prisma/repository/user.repo";
+
+import { withServiceWrapper } from "../utils/withWrapper";
 import { buildFindManyArgs } from "../utils/prisma";
-import authService from "./auth.service";
-import postService from "./post.service";
+import { AuthError, ForbiddenError, NotFoundError } from "../errors/app.error";
 
 const checkCommentCanBeUpdated = async (
     id: string,
     user: User | null | undefined,
 ): Promise<[boolean, Post]> => {
     if (!user || !user.id) {
-        throw new Error("User not authenticated");
+        throw new AuthError("User not authenticated");
     }
 
     if (!(await userRepository.checkUserExistsAndIsActive(user.id))) {
-        throw new Error("User not found or inactive");
+        throw new NotFoundError("User");
     }
 
     const dbComment = await commentRepository.getCommentById(id);
 
     if (!dbComment) {
-        throw new Error("Comment not found");
+        throw new NotFoundError("Comment");
     }
 
     const post = await postService.findPostById(dbComment.postId);
 
     if (!post) {
-        throw new Error("Post not found");
+        throw new NotFoundError("Post");
     }
 
     if (!authService.checkIsSameUser(user, dbComment.userId)) {
-        throw new Error("User not authorized to archive this comment");
+        throw new ForbiddenError("User not authorized to archive this comment");
     }
 
     if (!authService.checkIsSameUser(user, dbComment.userId)) {
-        throw new Error("User not authorized to update this comment");
+        throw new ForbiddenError("User not authorized to update this comment");
     }
 
     return [true, post];
@@ -100,15 +104,15 @@ const createComment = async (
     user: User | null | undefined,
 ): Promise<Comment> => {
     if (!user || !user.id) {
-        throw new Error("User not authenticated");
+        throw new AuthError("User not authenticated");
     }
 
     if (!(await userRepository.checkUserExistsAndIsActive(user.id))) {
-        throw new Error("User not found or inactive");
+        throw new NotFoundError("User");
     }
 
     if (!(await postService.checkPostExists(data.post))) {
-        throw new Error("Post not found");
+        throw new NotFoundError("Post");
     }
 
     const payload: Prisma.CommentCreateInput = {
@@ -134,16 +138,7 @@ const archiveComment = async (
     id: string,
     user: User | null | undefined,
 ): Promise<Comment> => {
-    const [canBeUpdated, post] = await checkCommentCanBeUpdated(id, user);
-
-    if (!canBeUpdated) {
-        throw new Error("Comment not found or not authorized to archive");
-    }
-
-    return mapDBCommentToComment(
-        await commentRepository.archiveComment(id),
-        post,
-    );
+    return updateComment(id, { archived: true }, user);
 };
 
 const updateComment = async (
@@ -154,7 +149,9 @@ const updateComment = async (
     const [canBeUpdated, post] = await checkCommentCanBeUpdated(id, user);
 
     if (!canBeUpdated) {
-        throw new Error("Comment not found or not authorized to update");
+        throw new ForbiddenError(
+            "Comment not found or not authorized to update",
+        );
     }
 
     const payload: Prisma.CommentUpdateInput = {};
@@ -169,7 +166,7 @@ const updateComment = async (
     );
 };
 
-const commentService = {
+const rawCommentService = {
     findAvailableComments,
     createComment,
     updateComment,
@@ -177,4 +174,7 @@ const commentService = {
     findCommentById,
 };
 
+const commentService = withServiceWrapper(rawCommentService, "comment");
+
 export default commentService;
+export type CommentService = typeof rawCommentService;

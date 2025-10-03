@@ -34,10 +34,6 @@ const updateComment = async (
     });
 };
 
-const archiveComment = async (id: string): Promise<Comment> => {
-    return await updateComment(id, { archived: true });
-};
-
 const orphanCommentsByPostId = async (postId: string): Promise<number> => {
     const result = await prisma.comment.updateMany({
         where: { postId },
@@ -85,7 +81,6 @@ const commentRepository = {
     getCommentById,
     getNonArchivedComments,
     updateComment,
-    archiveComment,
     orphanCommentsByPostId,
     checkCommentExistsAndIsActive,
     hasNextPage,

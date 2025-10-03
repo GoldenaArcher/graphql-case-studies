@@ -8,12 +8,12 @@ import { createLoaders } from "../loaders";
 import { logger } from "../../utils/logger";
 import userService from "../../services/user.service";
 import authService from "../../services/auth.service";
+import type { YogaInitialContext } from "graphql-yoga";
 
-const context = async ({
-    request,
-}: {
-    request: Request;
-}): Promise<Partial<GraphQLContext>> => {
+const context = async (
+    initialContext: YogaInitialContext,
+): Promise<GraphQLContext> => {
+    const { request } = initialContext;
     const requestId = randomUUID();
     let user: User | null = null;
 
@@ -37,7 +37,13 @@ const context = async ({
         );
     }
 
-    return { pubsub, requestId, loaders: createLoaders(), user };
+    return {
+        pubsub,
+        requestId,
+        loaders: createLoaders(),
+        user,
+        ...initialContext,
+    };
 };
 
 export default context;

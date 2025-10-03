@@ -1,5 +1,4 @@
 import type { GraphQLResolveInfo } from 'graphql';
-import type { User, Post, Comment } from '../../generated/prisma/index';
 import type { GraphQLContext } from '../graphql/context/type';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -8,7 +7,6 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -440,9 +438,9 @@ export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = 
     | ( AggregateUser )
   ;
   Connection:
-    | ( Omit<CommentConnection, 'edges'> & { edges: Array<_RefType['CommentEdge']> } )
-    | ( Omit<PostConnection, 'edges'> & { edges: Array<_RefType['PostEdge']> } )
-    | ( Omit<UserConnection, 'edges'> & { edges: Array<_RefType['UserEdge']> } )
+    | ( CommentConnection )
+    | ( PostConnection )
+    | ( UserConnection )
   ;
 };
 
@@ -452,12 +450,12 @@ export type ResolversTypes = {
   AggregateComment: ResolverTypeWrapper<AggregateComment>;
   AggregatePost: ResolverTypeWrapper<AggregatePost>;
   AggregateUser: ResolverTypeWrapper<AggregateUser>;
-  AuthPayload: ResolverTypeWrapper<Omit<AuthPayload, 'user'> & { user: ResolversTypes['User'] }>;
+  AuthPayload: ResolverTypeWrapper<AuthPayload>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Comment: ResolverTypeWrapper<Comment>;
-  CommentConnection: ResolverTypeWrapper<Omit<CommentConnection, 'edges'> & { edges: Array<ResolversTypes['CommentEdge']> }>;
-  CommentEdge: ResolverTypeWrapper<Omit<CommentEdge, 'node'> & { node: ResolversTypes['Comment'] }>;
-  CommentEvent: ResolverTypeWrapper<Omit<CommentEvent, 'data'> & { data?: Maybe<ResolversTypes['Comment']> }>;
+  CommentConnection: ResolverTypeWrapper<CommentConnection>;
+  CommentEdge: ResolverTypeWrapper<CommentEdge>;
+  CommentEvent: ResolverTypeWrapper<CommentEvent>;
   CommentWhereInput: CommentWhereInput;
   Connection: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Connection']>;
   CreateCommentInput: CreateCommentInput;
@@ -469,9 +467,9 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Post: ResolverTypeWrapper<Post>;
-  PostConnection: ResolverTypeWrapper<Omit<PostConnection, 'edges'> & { edges: Array<ResolversTypes['PostEdge']> }>;
-  PostEdge: ResolverTypeWrapper<Omit<PostEdge, 'node'> & { node: ResolversTypes['Post'] }>;
-  PostEvent: ResolverTypeWrapper<Omit<PostEvent, 'data'> & { data?: Maybe<ResolversTypes['Post']> }>;
+  PostConnection: ResolverTypeWrapper<PostConnection>;
+  PostEdge: ResolverTypeWrapper<PostEdge>;
+  PostEvent: ResolverTypeWrapper<PostEvent>;
   PostWhereInput: PostWhereInput;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   QueryMode: QueryMode;
@@ -483,8 +481,8 @@ export type ResolversTypes = {
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
   User: ResolverTypeWrapper<User>;
-  UserConnection: ResolverTypeWrapper<Omit<UserConnection, 'edges'> & { edges: Array<ResolversTypes['UserEdge']> }>;
-  UserEdge: ResolverTypeWrapper<Omit<UserEdge, 'node'> & { node: ResolversTypes['User'] }>;
+  UserConnection: ResolverTypeWrapper<UserConnection>;
+  UserEdge: ResolverTypeWrapper<UserEdge>;
   UserWhereInput: UserWhereInput;
 };
 
@@ -494,12 +492,12 @@ export type ResolversParentTypes = {
   AggregateComment: AggregateComment;
   AggregatePost: AggregatePost;
   AggregateUser: AggregateUser;
-  AuthPayload: Omit<AuthPayload, 'user'> & { user: ResolversParentTypes['User'] };
+  AuthPayload: AuthPayload;
   Boolean: Scalars['Boolean']['output'];
   Comment: Comment;
-  CommentConnection: Omit<CommentConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommentEdge']> };
-  CommentEdge: Omit<CommentEdge, 'node'> & { node: ResolversParentTypes['Comment'] };
-  CommentEvent: Omit<CommentEvent, 'data'> & { data?: Maybe<ResolversParentTypes['Comment']> };
+  CommentConnection: CommentConnection;
+  CommentEdge: CommentEdge;
+  CommentEvent: CommentEvent;
   CommentWhereInput: CommentWhereInput;
   Connection: ResolversInterfaceTypes<ResolversParentTypes>['Connection'];
   CreateCommentInput: CreateCommentInput;
@@ -510,9 +508,9 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   PageInfo: PageInfo;
   Post: Post;
-  PostConnection: Omit<PostConnection, 'edges'> & { edges: Array<ResolversParentTypes['PostEdge']> };
-  PostEdge: Omit<PostEdge, 'node'> & { node: ResolversParentTypes['Post'] };
-  PostEvent: Omit<PostEvent, 'data'> & { data?: Maybe<ResolversParentTypes['Post']> };
+  PostConnection: PostConnection;
+  PostEdge: PostEdge;
+  PostEvent: PostEvent;
   PostWhereInput: PostWhereInput;
   Query: Record<PropertyKey, never>;
   RegisterInput: RegisterInput;
@@ -523,8 +521,8 @@ export type ResolversParentTypes = {
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
   User: User;
-  UserConnection: Omit<UserConnection, 'edges'> & { edges: Array<ResolversParentTypes['UserEdge']> };
-  UserEdge: Omit<UserEdge, 'node'> & { node: ResolversParentTypes['User'] };
+  UserConnection: UserConnection;
+  UserEdge: UserEdge;
   UserWhereInput: UserWhereInput;
 };
 

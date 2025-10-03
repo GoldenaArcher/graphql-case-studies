@@ -6,7 +6,7 @@ const options: LoggerOptions = {
     ? {
         transport: {
           target: "pino-pretty",
-          options: { colorize: true, messageFormat: "[{app}/{service}] {msg}" },
+          options: { colorize: true, messageFormat: "[{app}/{service}] {msg}", translateTime: 'UTC:yyyy-mm-dd"T"HH:MM:ss.l"Z"', },
         },
       }
     : {}),
@@ -15,6 +15,7 @@ const options: LoggerOptions = {
 export const logger = pino({
   ...options,
   base: { app: "graphql-service" },
+  timestamp: pino.stdTimeFunctions.isoTime,
   serializers: {
     err: pino.stdSerializers.err,
   },

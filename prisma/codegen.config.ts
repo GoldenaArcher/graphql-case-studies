@@ -7,11 +7,11 @@ const config: CodegenConfig = {
     "./src/generated/graphql.ts": {
       config: {
         contextType: '../graphql/context/type#GraphQLContext',
-        mappers: {
-          User: '../../generated/prisma/index#User',
-          Post: '../../generated/prisma/index#Post',
-          Comment: '../../generated/prisma/index#Comment',
-        }
+        // mappers: {
+        //   User: '../../generated/prisma/index#User',
+        //   Post: '../../generated/prisma/index#Post',
+        //   Comment: '../../generated/prisma/index#Comment',
+        // }
       },
       plugins: ["typescript", "typescript-resolvers"],
     },

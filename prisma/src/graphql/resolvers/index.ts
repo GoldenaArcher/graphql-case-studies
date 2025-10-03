@@ -5,7 +5,7 @@ import { Mutation } from "./mutation";
 import { Subscription } from "./subscription";
 
 import { postResolvers } from "./post/resolvers";
-import { userResolvers } from "./user/resolver";
+import { userResolvers } from "./user/resolvers";
 import { commentResolvers } from "./comment/resolvers";
 
 
