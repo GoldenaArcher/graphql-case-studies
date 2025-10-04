@@ -28,6 +28,10 @@ export const logger = pino({
     },
 });
 
+export const commentLogger = logger.child({ service: "comment" });
+export const postLogger = logger.child({ service: "post" });
+export const userLogger = logger.child({ service: "user" });
+
 export function getLogger(domain: Domain, layer?: Layer) {
     return logger.child({ domain, layer });
 }

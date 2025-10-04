@@ -10,7 +10,7 @@ import {
     buildUserConnection,
     mapDBUserToUser,
 } from "../graphql/resolvers/user/user.mappers";
-import userRepository from "../prisma/repository/user.repo";
+import userRepository from "../db/repository/user.repo";
 import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";
 

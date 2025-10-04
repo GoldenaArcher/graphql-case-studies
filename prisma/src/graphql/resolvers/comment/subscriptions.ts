@@ -6,7 +6,7 @@ import type { EventPayload, GraphQLContext } from "../../context/type";
 
 import { commentLogger } from "../../../utils/logger";
 
-import postRepository from "../../../prisma/repository/post.repo";
+import postRepository from "../../../db/repository/post.repo";
 
 export const commentSubscriptions: Pick<SubscriptionResolvers, "comment"> = {
   comment: {

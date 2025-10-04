@@ -1,5 +1,5 @@
 import posts from './data/posts.json';
-import prisma from '../../src/prisma';
+import prisma from '../../src/db';
 
 export default async function seedPost() {
     console.log('🌱 Start seeding posts...');

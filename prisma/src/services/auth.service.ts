@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import type { LoginInput, RegisterInput, User } from '../generated/graphql';
 
 import { comparePassword, hashPassword } from '../utils/auth';
-import userRepository from '../prisma/repository/user.repo';
+import userRepository from '../db/repository/user.repo';
 import { mapDBUserToUser } from '../graphql/resolvers/user/user.mappers';
 
 import { logger } from '../utils/logger';

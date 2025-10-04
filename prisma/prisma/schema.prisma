@@ -15,10 +15,11 @@ model User {
   age       Int?
   active    Boolean   @default(false)
   password  String    @default("")
+  role      Role      @default(USER)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  comments  Comment[]
-  posts     Post[]
+  Post      Post[]
+  Comment   Comment[]
 }
 
 model Post {
@@ -30,8 +31,8 @@ model Post {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   author    String
-  comments  Comment[]
   user      User      @relation(fields: [author], references: [id])
+  Comment   Comment[]
 }
 
 model Comment {
@@ -45,4 +46,9 @@ model Comment {
   userId    String
   post      Post     @relation(fields: [postId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
 }

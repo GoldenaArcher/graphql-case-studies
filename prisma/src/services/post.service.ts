@@ -10,10 +10,10 @@ import {
     buildPostConnection,
     mapDBPostToPost,
 } from "../graphql/resolvers/post/post.mapper";
-import commentRepository from "../prisma/repository/comment.repo";
+import commentRepository from "../db/repository/comment.repo";
 
-import postRepository from "../prisma/repository/post.repo";
-import userRepository from "../prisma/repository/user.repo";
+import postRepository from "../db/repository/post.repo";
+import userRepository from "../db/repository/user.repo";
 import { postLogger } from "../utils/logger";
 import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";

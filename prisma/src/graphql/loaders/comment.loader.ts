@@ -1,4 +1,4 @@
-import prisma from '../../prisma';
+import prisma from '../../db';
 import { createBatchLoader } from '../../utils/loadder';
 
 export const commentByUserLoader = () =>

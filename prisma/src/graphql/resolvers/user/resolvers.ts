@@ -10,6 +10,6 @@ export const userResolvers: UserResolvers = {
   },
   async comments(parent, _args, context: GraphQLContext) {
     const comments = await context.loaders.commentByUserLoader.load(parent.id);
-    return comments.map(mapDBCommentToComment);
+    return comments.map(comment => mapDBCommentToComment(comment));
   },
 };

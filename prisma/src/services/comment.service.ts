@@ -16,8 +16,8 @@ import {
     buildCommentConnection,
     mapDBCommentToComment,
 } from "../graphql/resolvers/comment/comment.mapper";
-import commentRepository from "../prisma/repository/comment.repo";
-import userRepository from "../prisma/repository/user.repo";
+import commentRepository from "../db/repository/comment.repo";
+import userRepository from "../db/repository/user.repo";
 
 import { withServiceWrapper } from "../utils/withWrapper";
 import { buildFindManyArgs } from "../utils/prisma";
