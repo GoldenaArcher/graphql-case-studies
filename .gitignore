@@ -1,2 +1,4 @@
 # node modules for all the packages
 **/node_modules
+
+.DS_Store
