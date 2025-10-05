@@ -6,18 +6,16 @@ import type {
     UserWhereInput,
 } from "../generated/graphql";
 
-import {
-    buildUserConnection,
-    mapDBUserToUser,
-} from "../graphql/resolvers/user/user.mappers";
+import { buildUserConnection } from "../graphql/resolvers/user/user.mappers";
 import userRepository from "../db/repository/user.repo";
 import { buildFindManyArgs } from "../utils/prisma";
 import authService from "./auth.service";
+import { AuthError, NotFoundError } from "../errors/app.error";
 
 const findById = async (id: string) => {
     const user = await userRepository.findUserById(id);
-    if (!user) throw new Error("User not found");
-    return mapDBUserToUser(user);
+    if (!user) throw new NotFoundError("User");
+    return user;
 };
 
 export const findActiveUsers = async (
@@ -54,11 +52,11 @@ const updateUser = async (
 ) => {
     const dbUser = await userRepository.findUserById(id);
     if (!dbUser) {
-        throw new Error("User not found");
+        throw new NotFoundError("User not found");
     }
 
     if (!authService.checkIsSameUser(user, id)) {
-        throw new Error("User not authorized to update this user");
+        throw new AuthError("User not authorized to update this user");
     }
 
     const payload: Prisma.UserUpdateInput = {};

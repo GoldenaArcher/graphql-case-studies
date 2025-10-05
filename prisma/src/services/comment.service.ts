@@ -177,4 +177,4 @@ const rawCommentService = {
 const commentService = withServiceWrapper(rawCommentService, "comment");
 
 export default commentService;
-export type CommentService = typeof rawCommentService;
+export type CommentService = typeof commentService;

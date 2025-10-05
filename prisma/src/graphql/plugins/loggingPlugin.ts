@@ -4,65 +4,83 @@ import type {
     OperationDefinitionNode,
 } from "graphql";
 import { isAsyncIterable, type Plugin } from "graphql-yoga";
-import type { Logger } from "pino";
+import type { ExecuteFunction, TypedExecutionArgs } from "@envelop/types";
 import type { GraphQLContext } from "../context/type";
-import { asyncStore } from "../../tracing/asyncStore";
 
-export function createRequestLoggerPlugin(
-    logger: Logger,
-): Plugin<GraphQLContext> {
+import { asyncStore } from "../../tracing/asyncStore";
+import { logger } from "../../utils/logger";
+
+const logExecution = (
+    args: TypedExecutionArgs<GraphQLContext>,
+    setOpFn: (newExecute: ExecuteFunction) => void,
+    OpFn: ExecuteFunction,
+    isSubscription = false,
+) => {
+    const { contextValue } = args;
+    const { requestId, user } = contextValue;
+
+    const opName = args.operationName || "Anonymous";
+    const document = args.document as DocumentNode;
+
+    const querySummary = document?.definitions
+        ?.map((def: DefinitionNode) => def.kind)
+        .join(", ");
+
+    const variables = args.variableValues;
+
+    const operationDef = document?.definitions.find(
+        (def): def is OperationDefinitionNode =>
+            def.kind === "OperationDefinition",
+    );
+
+    const operationType = operationDef?.operation; // 'query' | 'mutation' | 'subscription'
+
+    const rootFields = operationDef?.selectionSet.selections
+        ?.filter((sel) => sel.kind === "Field")
+        .map((sel) => (sel as any).name?.value)
+        .filter(Boolean); // e.g., ['posts', 'user']
+
+    const loggerMsg = isSubscription
+        ? `GraphQL ${operationType ?? "operation"} Subscription: ${opName} (${
+              rootFields?.join(", ") || "unknown"
+          })`
+        : `GraphQL ${operationType ?? "operation"}: ${opName} (${
+              rootFields?.join(", ") || "unknown"
+          })`;
+
+    logger.info(
+        {
+            operationName: opName,
+            requestId,
+            querySummary,
+            operationType,
+            rootFields,
+            variables,
+        },
+        loggerMsg,
+    );
+
+    setOpFn(async (opArgs) => {
+        return asyncStore.run(
+            {
+                requestId: requestId!,
+                userId: user?.id ?? undefined,
+                operationName: args.operationName ?? "Anonymous",
+            },
+            async () => {
+                return OpFn(opArgs);
+            },
+        );
+    });
+};
+
+export function createRequestLoggerPlugin(): Plugin<GraphQLContext> {
     return {
         onExecute({ args, setExecuteFn, executeFn }) {
-            const { contextValue } = args;
-            const { requestId, user } = contextValue;
-
-            const opName = args.operationName || "Anonymous";
-            const document = args.document as DocumentNode;
-
-            const querySummary = document?.definitions
-                ?.map((def: DefinitionNode) => def.kind)
-                .join(", ");
-
-            const variables = args.variableValues;
-
-            const operationDef = document?.definitions.find(
-                (def): def is OperationDefinitionNode =>
-                    def.kind === "OperationDefinition",
-            );
-
-            const operationType = operationDef?.operation; // 'query' | 'mutation' | 'subscription'
-
-            const rootFields = operationDef?.selectionSet.selections
-                ?.filter((sel) => sel.kind === "Field")
-                .map((sel) => (sel as any).name?.value)
-                .filter(Boolean); // e.g., ['posts', 'user']
-
-            logger.info(
-                {
-                    operationName: opName,
-                    requestId,
-                    querySummary,
-                    operationType,
-                    rootFields,
-                    variables,
-                },
-                `GraphQL ${operationType ?? "operation"}: ${opName} (${
-                    rootFields?.join(", ") || "unknown"
-                })`,
-            );
-
-            setExecuteFn(async (execArgs) => {
-                return asyncStore.run(
-                    {
-                        requestId: requestId!,
-                        userId: user?.id ?? undefined,
-                        operationName: args.operationName ?? "Anonymous",
-                    },
-                    async () => {
-                        return executeFn(execArgs);
-                    },
-                );
-            });
+            logExecution(args, setExecuteFn, executeFn);
+        },
+        onSubscribe({ args, setSubscribeFn, subscribeFn }) {
+            logExecution(args, setSubscribeFn, subscribeFn, true);
         },
         async onExecutionResult({ result, context }) {
             const ctx = context as GraphQLContext;
@@ -73,7 +91,7 @@ export function createRequestLoggerPlugin(
                     if (singleResult.errors) {
                         logger.error(
                             {
-                                requestId: ctx.requestId,
+                                requestId,
                                 errors: singleResult.errors,
                             },
                             `GraphQL subscription errored`,
@@ -83,12 +101,12 @@ export function createRequestLoggerPlugin(
             } else {
                 if (result?.errors) {
                     logger.error(
-                        { requestId: ctx.requestId, errors: result.errors },
+                        { requestId, errors: result.errors },
                         `GraphQL execution resulted in errors`,
                     );
                 } else {
                     logger.info(
-                        { requestId: ctx.requestId },
+                        { requestId },
                         `GraphQL execution completed successfully`,
                     );
                 }

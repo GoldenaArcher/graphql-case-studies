@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-import type { User } from "../../generated/graphql";
+import type { User } from "../../../generated/prisma";
 import type { GraphQLContext } from "./type";
 
 import { pubsub } from "./pubsub";
@@ -9,6 +9,7 @@ import { logger } from "../../utils/logger";
 import userService from "../../services/user.service";
 import authService from "../../services/auth.service";
 import type { YogaInitialContext } from "graphql-yoga";
+import { AuthError } from "../../errors/app.error";
 
 const context = async (
     initialContext: YogaInitialContext,
@@ -24,7 +25,7 @@ const context = async (
         if (authHeader) {
             const [scheme, token] = authHeader.split(" ");
             if (scheme !== "Bearer" || !token) {
-                throw new Error("Invalid auth header format");
+                throw new AuthError("Invalid auth header format");
             }
 
             const userId = authService.verifyToken(token, requestId);

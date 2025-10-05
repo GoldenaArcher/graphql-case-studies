@@ -18,6 +18,8 @@ export function withWrapper<T extends object>(
                     const trace = getTraceContext();
                     const filterredArgs = args.filter((arg) => !!arg);
 
+                    const start = performance.now();
+
                     scopedLogger.info(
                         {
                             requestId: trace?.requestId,
@@ -30,24 +32,23 @@ export function withWrapper<T extends object>(
 
                     try {
                         const result = orig.apply(obj, args);
+                        const duration = performance.now() - start;
 
-                        if (result instanceof Promise) {
-                            return result.catch((err: any) => {
-                                scopedLogger.error(
-                                    {
-                                        requestId: trace?.requestId,
-                                        userId: trace?.userId,
-                                        method: String(prop),
-                                        err,
-                                    },
-                                    `${domain}.${layer}.${String(prop)} failed`,
-                                );
-                                throw err;
-                            });
-                        }
+                        scopedLogger.info(
+                            {
+                                requestId: trace?.requestId,
+                                userId: trace?.userId,
+                                method: String(prop),
+                                duration: `${duration.toFixed(2)}ms`,
+                            },
+                            `${domain}.${layer}.${String(prop)} succeeded`,
+                        );
 
                         return result;
                     } catch (err) {
+                        const duration = performance.now() - start;
+                        const durationMsg = `${duration.toFixed(2)}ms`;
+
                         if (err instanceof AppError) {
                             scopedLogger.error(
                                 {
@@ -56,6 +57,10 @@ export function withWrapper<T extends object>(
                                     method: String(prop),
                                     code: err.code,
                                     details: err.details,
+                                    domain: err.domain,
+                                    layer: err.layer,
+                                    httpStatus: err.httpStatus,
+                                    duration: durationMsg,
                                 },
                                 `${domain}.${layer}.${String(prop)} failed: ${
                                     err.message
@@ -64,27 +69,24 @@ export function withWrapper<T extends object>(
                             throw err;
                         }
 
-                        if (err instanceof Error) {
-                            const wrapped = new AppError(
-                                err.message || "Unexpected error",
-                                "INTERNAL_ERROR",
-                                500,
-                                { originalError: err, domain, layer },
-                            );
-                            scopedLogger.error(
-                                { err },
-                                `Unhandled error in ${String(prop)}`,
-                            );
-                            throw wrapped;
-                        }
-
                         const wrapped = new AppError(
-                            "Unknown error",
+                            err instanceof Error
+                                ? err.message
+                                : "Unknown error",
                             "INTERNAL_ERROR",
                             500,
-                            { originalError: String(err), domain, layer },
+                            {
+                                originalError: err,
+                                domain,
+                                layer,
+                            },
                         );
-                        scopedLogger.error({ err }, "Non-Error thrown");
+
+                        scopedLogger.error(
+                            { error: err, duration: durationMsg },
+                            `Unhandled error in ${String(prop)}`,
+                        );
+
                         throw wrapped;
                     }
                 };

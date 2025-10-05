@@ -7,7 +7,6 @@ import type {
 import authService from "../../../services/auth.service";
 import userService from "../../../services/user.service";
 import type { GraphQLContext } from "../../context/type";
-import { mapDBUserToUser } from "./user.mappers";
 
 export const userMutations: Pick<
   MutationResolvers,
@@ -15,7 +14,7 @@ export const userMutations: Pick<
 > = {
   activateUser: async (_parent, { id }: MutationActivateUserArgs, { user }: GraphQLContext) => {
     const dbUser = await authService.activateUser(id, user);
-    return mapDBUserToUser(dbUser);
+    return dbUser;
   },
   deleteUser: async (_parent, { id }: MutationDeleteUserArgs, { user }: GraphQLContext) => {
     await authService.deactivateUser(id, user);
@@ -23,6 +22,6 @@ export const userMutations: Pick<
   },
   updateUser: async (_parent, { id, data }: MutationUpdateUserArgs, { user }: GraphQLContext) => {
     const dbUser = await userService.updateUser(id, data, user);
-    return mapDBUserToUser(dbUser);
+    return dbUser;
   },
 };

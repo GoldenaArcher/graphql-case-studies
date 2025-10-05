@@ -2,7 +2,6 @@ import type { PostResolvers } from "../../../generated/graphql";
 import type { GraphQLContext } from "../../context/type";
 
 import { mapDBCommentToComment } from "../comment/comment.mapper";
-import { mapDBUserToUser } from "../user/user.mappers";
 
 export const postResolvers: PostResolvers = {
   async comments(parent, _args, context: GraphQLContext) {
@@ -11,6 +10,6 @@ export const postResolvers: PostResolvers = {
   },
   async author(parent, _args, context: GraphQLContext) {
     const user = await context.loaders.userByPostLoader.load(parent.id);
-    return mapDBUserToUser(user[0]!.value);
+    return user[0]!.value;
   },
 };

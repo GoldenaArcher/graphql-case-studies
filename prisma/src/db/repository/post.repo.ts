@@ -1,4 +1,5 @@
 import type { Post, Prisma } from "../../../generated/prisma";
+import { NotFoundError } from "../../errors/app.error";
 import prisma from "../index";
 
 const repo = prisma.post;
@@ -36,7 +37,7 @@ const updatePost = async (
     data: Prisma.PostUpdateInput,
 ): Promise<Post> => {
     if (!(await checkPostExists(postId))) {
-        throw new Error("Post not found");
+        throw new NotFoundError("Post");
     }
 
     return await prisma.post.update({
@@ -49,7 +50,7 @@ const archivePost = async (postId: string): Promise<Post> => {
     const post = await findPostById(postId);
 
     if (!post || post.archived || !post.published) {
-        throw new Error("Post does not exist.");
+        throw new NotFoundError("Post");
     }
 
     const archivedPost = await updatePost(postId, { archived: true });

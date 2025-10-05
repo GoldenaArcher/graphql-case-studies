@@ -18,9 +18,12 @@ export function buildFindManyArgs<
     if (where) {
         args.where = where;
     }
-    if (take != null && take >= 0) {
+    if (take != null && take >= 0 && take < 20) {
         args.take = take;
+    } else {
+        args.take = 20;
     }
+
     if (cursor) {
         args.cursor = { id: cursor };
         args.skip = 1;
@@ -33,15 +36,19 @@ export function buildFindManyArgs<
     return args as T;
 }
 
-export function buildConnection<TNode, TDbEntity extends { id: string }, TConnection>(
+export function buildConnection<
+    TNode,
+    TDbEntity extends { id: string },
+    TConnection,
+>(
     items: TDbEntity[],
     after: string | null | undefined,
     hasNextPage: boolean,
     totalCount: number,
-    mapper: (item: TDbEntity) => TNode
+    mapper?: (item: TDbEntity) => TNode,
 ): TConnection {
     const edges = items.map((item) => ({
-        node: mapper(item),
+        node: mapper ? mapper(item) : item,
         cursor: item.id,
     }));
 
@@ -49,7 +56,8 @@ export function buildConnection<TNode, TDbEntity extends { id: string }, TConnec
         hasNextPage,
         hasPreviousPage: Boolean(after),
         startCursor: edges.length > 0 ? edges[0]?.cursor ?? null : null,
-        endCursor: edges.length > 0 ? edges[edges.length - 1]?.cursor ?? null : null,
+        endCursor:
+            edges.length > 0 ? edges[edges.length - 1]?.cursor ?? null : null,
     };
 
     const aggregate = {

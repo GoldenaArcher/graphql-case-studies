@@ -1,4 +1,5 @@
 import type { Prisma, User } from "../../../generated/prisma";
+import { NotFoundError, ValidationError } from "../../errors/app.error";
 import prisma from "../index";
 
 const repo = prisma.user;
@@ -37,11 +38,11 @@ const updateUser = async (
     data: Prisma.UserUpdateInput,
 ): Promise<User> => {
     if (!(await checkUserExists(id))) {
-        throw new Error("User not found");
+        throw new NotFoundError("User");
     }
 
     if (data.email && (await isEmailTaken(data.email as string))) {
-        throw new Error("Email already taken");
+        throw new ValidationError("Email already taken");
     }
 
     const payload: Prisma.UserUpdateInput = {};

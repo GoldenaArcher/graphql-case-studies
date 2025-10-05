@@ -7,6 +7,7 @@ import type { EventPayload, GraphQLContext } from "../../context/type";
 import { commentLogger } from "../../../utils/logger";
 
 import postRepository from "../../../db/repository/post.repo";
+import { NotFoundError } from "../../../errors/app.error";
 
 export const commentSubscriptions: Pick<SubscriptionResolvers, "comment"> = {
   comment: {
@@ -14,7 +15,7 @@ export const commentSubscriptions: Pick<SubscriptionResolvers, "comment"> = {
       const post = await postRepository.findPostById(args.postId);
 
       if (!post || !post.published) {
-        throw new Error("Post not found");
+        throw new NotFoundError("Post");
       }
 
       commentLogger.info(
