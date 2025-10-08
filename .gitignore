@@ -1,4 +1,6 @@
 # node modules for all the packages
 **/node_modules
+**/.parcel-cache
+**/dist
 
 .DS_Store
