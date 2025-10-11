@@ -1,5 +1,5 @@
 import type { GraphQLResolveInfo } from 'graphql';
-import type { User } from '../../generated/prisma/index';
+import type { User as UserModel } from '../../generated/prisma/index';
 import type { GraphQLContext } from '../graphql/context/type';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -482,7 +482,7 @@ export type ResolversTypes = {
   UpdateCommentInput: UpdateCommentInput;
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
-  User: ResolverTypeWrapper<User>;
+  User: ResolverTypeWrapper<UserModel>;
   UserConnection: ResolverTypeWrapper<Omit<UserConnection, 'edges'> & { edges: Array<ResolversTypes['UserEdge']> }>;
   UserEdge: ResolverTypeWrapper<Omit<UserEdge, 'node'> & { node: ResolversTypes['User'] }>;
   UserWhereInput: UserWhereInput;
@@ -522,7 +522,7 @@ export type ResolversParentTypes = {
   UpdateCommentInput: UpdateCommentInput;
   UpdatePostInput: UpdatePostInput;
   UpdateUserInput: UpdateUserInput;
-  User: User;
+  User: UserModel;
   UserConnection: Omit<UserConnection, 'edges'> & { edges: Array<ResolversParentTypes['UserEdge']> };
   UserEdge: Omit<UserEdge, 'node'> & { node: ResolversParentTypes['User'] };
   UserWhereInput: UserWhereInput;

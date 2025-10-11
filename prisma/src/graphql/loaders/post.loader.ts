@@ -1,5 +1,5 @@
 import prisma from '../../db';
-import { createBatchLoader } from '../../utils/loadder';
+import { createBatchLoader } from '../../utils/loader';
 
 export const postByUserLoader = () =>
     createBatchLoader(
