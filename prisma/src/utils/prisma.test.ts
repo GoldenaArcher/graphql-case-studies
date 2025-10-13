@@ -1,10 +1,7 @@
 import { buildFindManyArgs, buildConnection } from "./prisma";
 
-type UserNode = { id: string; name: string };
 type UserDbEntity = { id: string; name: string; upper: string };
-type UserConnection = ReturnType<
-    typeof buildConnection<UserNode, UserDbEntity, any>
->;
+type UserConnection = ReturnType<typeof buildConnection<UserDbEntity, any>>;
 
 describe("buildFindManyArgs", () => {
     it("should build args with where, take, skip", () => {
@@ -45,18 +42,7 @@ describe("buildConnection", () => {
     ];
 
     it("should build connection with mapper", () => {
-        const mapper = (item: any) => ({
-            ...item,
-            upper: item.name.toUpperCase(),
-        });
-
-        const connection = buildConnection(
-            items,
-            null,
-            false,
-            items.length,
-            mapper,
-        );
+        const connection = buildConnection(items, null, false, items.length);
 
         expect(connection).toMatchObject({
             edges: [

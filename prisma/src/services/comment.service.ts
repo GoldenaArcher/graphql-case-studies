@@ -1,21 +1,20 @@
 import type { Prisma } from "../../generated/prisma";
 import type {
-    Comment,
     CommentConnection,
     CommentWhereInput,
     CreateCommentInput,
-    Post,
     UpdateCommentInput,
-    User,
 } from "../generated/graphql";
+import type {
+    User as DBUser,
+    Post as DBPost,
+    Comment as DBComment,
+} from "../../generated/prisma";
 
 import authService from "./auth.service";
 import postService from "./post.service";
 
-import {
-    buildCommentConnection,
-    mapDBCommentToComment,
-} from "../graphql/resolvers/comment/comment.mapper";
+import { buildCommentConnection } from "../graphql/resolvers/comment/comment.mapper";
 import commentRepository from "../db/repository/comment.repo";
 import userRepository from "../db/repository/user.repo";
 
@@ -25,8 +24,8 @@ import { AuthError, ForbiddenError, NotFoundError } from "../errors/app.error";
 
 const checkCommentCanBeUpdated = async (
     id: string,
-    user: User | null | undefined,
-): Promise<[boolean, Post]> => {
+    user: DBUser | null | undefined,
+): Promise<[boolean, DBPost]> => {
     if (!user || !user.id) {
         throw new AuthError("User not authenticated");
     }
@@ -89,20 +88,20 @@ const findAvailableComments = async (
     return buildCommentConnection(comments, after, hasNextPage, totalCount);
 };
 
-const findCommentById = async (id: string): Promise<Comment | null> => {
+const findCommentById = async (id: string): Promise<DBComment | null> => {
     const dbComment = await commentRepository.getCommentById(id);
 
     if (!dbComment) {
         return null;
     }
 
-    return mapDBCommentToComment(dbComment);
+    return dbComment;
 };
 
 const createComment = async (
     data: CreateCommentInput,
-    user: User | null | undefined,
-): Promise<Comment> => {
+    user: DBUser | null | undefined,
+): Promise<DBComment> => {
     if (!user || !user.id) {
         throw new AuthError("User not authenticated");
     }
@@ -129,23 +128,21 @@ const createComment = async (
         },
     };
 
-    return mapDBCommentToComment(
-        await commentRepository.createComment(payload),
-    );
+    return await commentRepository.createComment(payload);
 };
 
 const archiveComment = async (
     id: string,
-    user: User | null | undefined,
-): Promise<Comment> => {
+    user: DBUser | null | undefined,
+): Promise<DBComment> => {
     return updateComment(id, { archived: true }, user);
 };
 
 const updateComment = async (
     id: string,
     data: UpdateCommentInput,
-    user: User | null | undefined,
-): Promise<Comment> => {
+    user: DBUser | null | undefined,
+): Promise<DBComment> => {
     const [canBeUpdated, post] = await checkCommentCanBeUpdated(id, user);
 
     if (!canBeUpdated) {
@@ -160,10 +157,7 @@ const updateComment = async (
         payload.text = data.text;
     }
 
-    return mapDBCommentToComment(
-        await commentRepository.updateComment(id, payload),
-        post,
-    );
+    return await commentRepository.updateComment(id, payload);
 };
 
 const rawCommentService = {

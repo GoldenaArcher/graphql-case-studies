@@ -4,12 +4,10 @@ import type {
     PostConnection,
     PostWhereInput,
     UpdatePostInput,
-    User,
 } from "../generated/graphql";
-import {
-    buildPostConnection,
-    mapDBPostToPost,
-} from "../graphql/resolvers/post/post.mapper";
+import type { User as DBUser } from "../../generated/prisma";
+
+import { buildPostConnection } from "../graphql/resolvers/post/post.mapper";
 import commentRepository from "../db/repository/comment.repo";
 
 import postRepository from "../db/repository/post.repo";
@@ -20,7 +18,7 @@ import authService from "./auth.service";
 
 const createPost = async (
     data: CreatePostInput,
-    user: User | null | undefined,
+    user: DBUser | null | undefined,
 ) => {
     if (!user || !user.id) {
         throw new Error("User not authenticated");
@@ -40,7 +38,7 @@ const createPost = async (
         },
     };
 
-    return mapDBPostToPost(await postRepository.createPost(payload));
+    return await postRepository.createPost(payload);
 };
 
 // alternative option is to create another method called findPostByIdAndUserId
@@ -49,7 +47,7 @@ const createPost = async (
 const updatePost = async (
     id: string,
     data: UpdatePostInput,
-    user: User | null | undefined,
+    user: DBUser | null | undefined,
 ) => {
     const retrievedUser = await authService.getUser(user);
 
@@ -77,10 +75,10 @@ const updatePost = async (
         payload.body = data.body;
     }
 
-    return mapDBPostToPost(await postRepository.updatePost(id, payload));
+    return await postRepository.updatePost(id, payload);
 };
 
-const archivePost = async (id: string, user: User | null | undefined) => {
+const archivePost = async (id: string, user: DBUser | null | undefined) => {
     const retrievedUser = await authService.getUser(user);
 
     if (!(await authService.checkUserIsAuthenticatedAndActive(retrievedUser))) {
@@ -109,10 +107,10 @@ const archivePost = async (id: string, user: User | null | undefined) => {
         );
     }
 
-    return mapDBPostToPost(archivedPost);
+    return archivedPost;
 };
 
-const publishPost = async (id: string, user: User | null | undefined) => {
+const publishPost = async (id: string, user: DBUser | null | undefined) => {
     const retrievedUser = await authService.getUser(user);
 
     if (!(await authService.checkUserIsAuthenticatedAndActive(retrievedUser))) {
@@ -129,7 +127,7 @@ const publishPost = async (id: string, user: User | null | undefined) => {
         throw new Error("Post does not exist.");
     }
 
-    return mapDBPostToPost(await postRepository.publishPost(id));
+    return await postRepository.publishPost(id);
 };
 
 const findPostById = async (id: string) => {
@@ -139,7 +137,7 @@ const findPostById = async (id: string) => {
         throw new Error("Post not found");
     }
 
-    return mapDBPostToPost(post);
+    return post;
 };
 
 const findAvailablePosts = async (

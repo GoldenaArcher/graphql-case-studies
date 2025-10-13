@@ -1,14 +1,6 @@
-import type { Comment, CommentConnection, Post } from '../../../generated/graphql';
-import type { Comment as DbComment } from '../../../../generated/prisma';
-import { buildConnection } from '../../../utils/prisma';
-
-export const mapDBCommentToComment = (data: DbComment, post?: Post): Comment => {
-    return {
-        ...data,
-        author: null,
-        post: post ?? null,
-    };
-};
+import type { CommentConnection } from "../../../generated/graphql";
+import type { Comment as DbComment } from "../../../../generated/prisma";
+import { buildConnection } from "../../../utils/prisma";
 
 export const buildCommentConnection = (
     comments: DbComment[],
@@ -16,11 +8,5 @@ export const buildCommentConnection = (
     hasNextPage: boolean,
     totalCount: number,
 ): CommentConnection => {
-    return buildConnection(
-        comments,
-        after,
-        hasNextPage,
-        totalCount,
-        mapDBCommentToComment,
-    );
+    return buildConnection(comments, after, hasNextPage, totalCount);
 };

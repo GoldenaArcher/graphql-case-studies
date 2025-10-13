@@ -36,19 +36,14 @@ export function buildFindManyArgs<
     return args as T;
 }
 
-export function buildConnection<
-    TNode,
-    TDbEntity extends { id: string },
-    TConnection,
->(
+export function buildConnection<TDbEntity extends { id: string }, TConnection>(
     items: TDbEntity[],
     after: string | null | undefined,
     hasNextPage: boolean,
     totalCount: number,
-    mapper?: (item: TDbEntity) => TNode,
 ): TConnection {
     const edges = items.map((item) => ({
-        node: mapper ? mapper(item) : item,
+        node: item,
         cursor: item.id,
     }));
 

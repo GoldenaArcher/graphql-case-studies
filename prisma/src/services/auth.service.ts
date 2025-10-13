@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
-import type { LoginInput, RegisterInput, User } from "../generated/graphql";
+import type { LoginInput, RegisterInput } from "../generated/graphql";
+import type { User as UserModel } from "../../generated/prisma";
 
 import { comparePassword, hashPassword } from "../utils/auth";
 import userRepository from "../db/repository/user.repo";
@@ -68,7 +69,7 @@ const verifyToken = (token: string, requestId: string) => {
     }
 };
 
-const getUser = async (user: User | string | null | undefined) => {
+const getUser = async (user: UserModel | string | null | undefined) => {
     if (!user) {
         throw new Error("User not found");
     }
@@ -86,7 +87,7 @@ const getUser = async (user: User | string | null | undefined) => {
 };
 
 const checkUserIsAuthenticatedAndActive = async (
-    user: User | string | null | undefined,
+    user: UserModel | string | null | undefined,
 ) => {
     if (!user) {
         return false;
@@ -99,11 +100,11 @@ const checkUserIsAuthenticatedAndActive = async (
         return false;
     }
 
-    return !!(user as User).id;
+    return !!(user as UserModel).id;
 };
 
 const checkIsSameUser = (
-    user: User | null | undefined | string,
+    user: UserModel | null | undefined | string,
     id: string,
 ) => {
     if (typeof user === "string") {
@@ -113,7 +114,7 @@ const checkIsSameUser = (
     return user && user.id === id;
 };
 
-const activateUser = async (id: string, user: User | null | undefined) => {
+const activateUser = async (id: string, user: UserModel | null | undefined) => {
     const dbUser = await userRepository.findUserById(id);
 
     if (!dbUser) {
@@ -131,7 +132,10 @@ const activateUser = async (id: string, user: User | null | undefined) => {
     return await userRepository.activateUser(id);
 };
 
-const deactivateUser = async (id: string, user: User | null | undefined) => {
+const deactivateUser = async (
+    id: string,
+    user: UserModel | null | undefined,
+) => {
     const dbUser = await userRepository.findUserById(id);
 
     if (!dbUser) {

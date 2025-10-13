@@ -9,8 +9,11 @@ const config: CodegenConfig = {
                 contextType: "../graphql/context/type#GraphQLContext",
                 mappers: {
                     User: "../../generated/prisma/index#User",
-                    //   Post: '../../generated/prisma/index#Post',
-                    //   Comment: '../../generated/prisma/index#Comment',
+                    UserConnection: "./graphql#UserConnection",
+                    Post: "../../generated/prisma/index#Post",
+                    PostConnection: "./graphql#PostConnection",
+                    Comment: "../../generated/prisma/index#Comment",
+                    CommentConnection: "./graphql#CommentConnection",
                 },
                 mapperTypeSuffix: "Model",
                 // typesPrefix: "Gql",

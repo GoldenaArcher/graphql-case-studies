@@ -1,10 +1,10 @@
 import type { Prisma } from "../../generated/prisma";
 import type {
     UpdateUserInput,
-    User,
     UserConnection,
     UserWhereInput,
 } from "../generated/graphql";
+import type { User as UserModel } from "../../generated/prisma";
 
 import { buildUserConnection } from "../graphql/resolvers/user/user.mappers";
 import userRepository from "../db/repository/user.repo";
@@ -48,7 +48,7 @@ export const findActiveUsers = async (
 const updateUser = async (
     id: string,
     data: UpdateUserInput,
-    user: User | null | undefined,
+    user: UserModel | null | undefined,
 ) => {
     const dbUser = await userRepository.findUserById(id);
     if (!dbUser) {

@@ -1,12 +1,16 @@
 import type { YogaInitialContext } from "graphql-yoga";
-import type { Post, Comment, EventType } from "../../generated/graphql";
-import type { User } from "../../../generated/prisma";
+import type { EventType } from "../../generated/graphql";
+import type {
+    User as DBUser,
+    Post as DBPost,
+    Comment as DBComment,
+} from "../../../generated/prisma";
 import type { createLoaders } from "../loaders";
 import type { pubsub } from "./pubsub";
 
 export type EntityMap = {
-    comment: Comment;
-    post: Post;
+    comment: DBComment;
+    post: DBPost;
 };
 
 export type EventPayload<T> = {
@@ -33,5 +37,5 @@ export type GraphQLContext = {
     pubsub: typeof pubsub;
     requestId?: string;
     loaders: ReturnType<typeof createLoaders>;
-    user?: User | null;
+    user?: DBUser | null;
 } & YogaInitialContext;
