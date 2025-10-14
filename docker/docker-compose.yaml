@@ -1,0 +1,68 @@
+services:
+  postgres17-local:
+    image: postgres:17.6
+    container_name: postgres17-local
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dd-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: dd-agent
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      # ✅ 必需
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=datadoghq.com
+      - DD_ENV=dev
+
+      # ✅ 启用 APM
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+
+      # ✅ 启用 DogStatsD
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+
+      # ✅ 可选 socket，用于性能优化（只在你需要的时候打开）
+      - DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+      - DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
+
+    volumes:
+      - /var/run/datadog:/var/run/datadog
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+
+    ports:
+      # APM trace 默认端口
+      - "8126:8126"
+      # DogStatsD 默认端口
+      - "8125:8125/udp"
+
+  # app:
+  #   build: .
+  #   container_name: myapp
+  #   environment:
+  #     # 指定 agent 主机名（docker 内部通信）
+  #     - DD_AGENT_HOST=dd-agent
+  #     - DD_TRACE_AGENT_PORT=8126
+  #     - DD_ENV=dev
+  #     - DD_SERVICE=myapp
+  #   depends_on:
+  #     - dd-agent
+  #   ports:
+  #     - "3000:3000"
+
+volumes:
+  postgres_data:
