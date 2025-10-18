@@ -9,6 +9,16 @@ import type { GraphQLContext } from "../context/type";
 
 import { asyncStore } from "../../tracing/asyncStore";
 import { logger } from "../../utils/logger";
+import {
+    finishGraphQLOperationSpan,
+    runWithinSpan,
+    startGraphQLOperationSpan,
+} from "../../analytics/tracer";
+
+const operationSpans = new WeakMap<
+    GraphQLContext,
+    ReturnType<typeof startGraphQLOperationSpan>
+>();
 
 const logExecution = (
     args: TypedExecutionArgs<GraphQLContext>,
@@ -60,6 +70,18 @@ const logExecution = (
         loggerMsg,
     );
 
+    const span = startGraphQLOperationSpan({
+        operationName: opName,
+        operationType,
+        requestId,
+        userId: user?.id ?? undefined,
+        rootFields,
+    });
+
+    if (span) {
+        operationSpans.set(contextValue, span);
+    }
+
     setOpFn(async (opArgs) => {
         return asyncStore.run(
             {
@@ -68,7 +90,7 @@ const logExecution = (
                 operationName: args.operationName ?? "Anonymous",
             },
             async () => {
-                return OpFn(opArgs);
+                return runWithinSpan(span, () => OpFn(opArgs));
             },
         );
     });
@@ -85,10 +107,13 @@ export function createRequestLoggerPlugin(): Plugin<GraphQLContext> {
         async onExecutionResult({ result, context }) {
             const ctx = context as GraphQLContext;
             const requestId = ctx.requestId;
+            const span = operationSpans.get(ctx);
 
             if (isAsyncIterable(result)) {
+                const aggregatedErrors: unknown[] = [];
                 for await (const singleResult of result) {
                     if (singleResult.errors) {
+                        aggregatedErrors.push(...singleResult.errors);
                         logger.error(
                             {
                                 requestId,
@@ -98,18 +123,25 @@ export function createRequestLoggerPlugin(): Plugin<GraphQLContext> {
                         );
                     }
                 }
+                finishGraphQLOperationSpan(span, aggregatedErrors);
             } else {
                 if (result?.errors) {
                     logger.error(
                         { requestId, errors: result.errors },
                         `GraphQL execution resulted in errors`,
                     );
+                    finishGraphQLOperationSpan(span, result.errors);
                 } else {
                     logger.info(
                         { requestId },
                         `GraphQL execution completed successfully`,
                     );
+                    finishGraphQLOperationSpan(span);
                 }
+            }
+
+            if (span) {
+                operationSpans.delete(ctx);
             }
         },
     };

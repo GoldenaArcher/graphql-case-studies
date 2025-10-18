@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -e  # 遇到错误立即中断
+set -e  # Exit immediately on error
 echo "🚀 Starting local environment..."
 
-# Step 1: 启动 docker 容器
+# Step 1: start Docker containers
 echo "🐳 Starting Docker containers..."
 cd "$(dirname "$0")/../docker"
 docker compose up -d
 
-# Step 2: 检查数据库是否已就绪
+# Step 2: check if the database is ready
 echo "⏳ Waiting for PostgreSQL to be ready..."
 until docker exec postgres17-local pg_isready -U postgres > /dev/null 2>&1; do
   sleep 1
@@ -16,15 +16,15 @@ until docker exec postgres17-local pg_isready -U postgres > /dev/null 2>&1; do
 done
 echo "✅ PostgreSQL is ready."
 
-# Step 3: 回到 Prisma 目录，运行迁移和 seed
+# Step 3: return to the Prisma directory to run migrations and seed data
 echo "📦 Applying Prisma migrations and seeding data..."
 cd ../prisma
 npm install --silent
 npm run db:push
 npm run seed
 
-# Step 4: 启动 backend server（可选）
-# echo "🚀 Starting backend server..."
+# Step 4: start the backend service (optional)
+# echo "🚀 Starting backend service..."
 # cd ../backend
 # npm run dev &
 

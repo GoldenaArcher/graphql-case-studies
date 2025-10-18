@@ -21,21 +21,35 @@ services:
     env_file:
       - ./.env
     environment:
-      # ✅ 必需
+      # ✅ Required
       - DD_API_KEY=${DD_API_KEY}
       - DD_SITE=datadoghq.com
       - DD_ENV=dev
 
-      # ✅ 启用 APM
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+
+      # ✅ Enable APM
       - DD_APM_ENABLED=true
       - DD_APM_NON_LOCAL_TRAFFIC=true
+      
+      # ✅ Disable sampling limits to accept all traces (development)
+      - DD_APM_MAX_TPS=200
+      - DD_APM_ERROR_TPS=200
+      
+      # ✅ Disable APM filters so every trace is accepted
+      - DD_APM_FILTER_TAGS_REQUIRE=
+      - DD_APM_FILTER_TAGS_REJECT=
+      
+      # ✅ Debug mode
+      - DD_LOG_LEVEL=debug
 
-      # ✅ 启用 DogStatsD
+      # ✅ Enable DogStatsD
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
 
-      # ✅ 可选 socket，用于性能优化（只在你需要的时候打开）
-      - DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
-      - DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
+      # ✅ Comment out socket configuration and rely on HTTP (more stable)
+      # - DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+      # - DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
 
     volumes:
       - /var/run/datadog:/var/run/datadog
@@ -45,16 +59,16 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
 
     ports:
-      # APM trace 默认端口
+      # Default APM trace port
       - "8126:8126"
-      # DogStatsD 默认端口
+      # Default DogStatsD port
       - "8125:8125/udp"
 
   # app:
   #   build: .
   #   container_name: myapp
   #   environment:
-  #     # 指定 agent 主机名（docker 内部通信）
+  #     # Specify agent hostname for Docker internal networking
   #     - DD_AGENT_HOST=dd-agent
   #     - DD_TRACE_AGENT_PORT=8126
   #     - DD_ENV=dev
